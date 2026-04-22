@@ -25,11 +25,19 @@
 
 ## Πώς να τρέξεις τοπικά
 
+**Mac / Linux:**
+
 ```bash
-python3 -m http.server 8081
+./start.sh
 ```
 
-Άνοιξε τον browser στο: `http://localhost:8081`
+**Windows:**
+
+```bat
+start.bat  ← διπλό κλικ
+```
+
+Ανοίγει αυτόματα ο browser στο `http://localhost:8081`.
 
 > Το voice demo χρειάζεται μικρόφωνο και λειτουργεί μόνο σε `localhost` ή `https`.
 
