@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Μπορείς να το ξεχωρίσεις; — Trusty Devil</title>
+  <style>
+    :root {
+      --red: #e63946;
+      --green: #2ecc71;
+      --dark: #0d0d0d;
+      --card-bg: #161616;
+      --border: #2a2a2a;
+      --text: #e8e8e8;
+      --muted: #888;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--dark);
+      color: var(--text);
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      min-height: 100vh;
+    }
+
+    /* ── HEADER ── */
+    .header {
+      text-align: center;
+      padding: 48px 24px 32px;
+      border-bottom: 1px solid var(--border);
+      background: radial-gradient(ellipse at top, #1a0000 0%, var(--dark) 65%);
+    }
+
+    .header .back {
+      position: absolute;
+      left: 24px; top: 24px;
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.82rem;
+    }
+
+    .header .back:hover { color: var(--text); }
+
+    .header h1 {
+      font-size: clamp(1.8rem, 5vw, 3rem);
+      font-weight: 900;
+    }
+
+    .header h1 span { color: var(--red); }
+
+    .header p {
+      margin-top: 12px;
+      color: var(--muted);
+      font-size: 0.9rem;
+      max-width: 500px;
+      margin-inline: auto;
+      line-height: 1.6;
+    }
+
+    /* ── PROGRESS ── */
+    .progress-bar-wrap {
+      max-width: 700px;
+      margin: 28px auto 0;
+      padding: 0 24px;
+    }
+
+    .progress-meta {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.75rem;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+
+    .progress-bar {
+      height: 4px;
+      background: var(--border);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: var(--red);
+      border-radius: 2px;
+      transition: width 0.4s ease;
+    }
+
+    /* ── QUESTION CARD ── */
+    .quiz-wrap {
+      max-width: 700px;
+      margin: 40px auto;
+      padding: 0 24px 60px;
+    }
+
+    .question-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      padding: 36px;
+      margin-bottom: 24px;
+    }
+
+    .q-category {
+      font-size: 0.7rem;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--red);
+      margin-bottom: 12px;
+    }
+
+    .q-text {
+      font-size: 1.1rem;
+      font-weight: 700;
+      line-height: 1.5;
+      margin-bottom: 20px;
+    }
+
+    .q-excerpt {
+      background: #0d0d0d;
+      border-left: 3px solid var(--border);
+      padding: 16px 20px;
+      font-size: 0.88rem;
+      color: #bbb;
+      line-height: 1.7;
+      font-style: italic;
+      margin-bottom: 24px;
+      border-radius: 0 4px 4px 0;
+    }
+
+    /* ── OPTIONS ── */
+    .options {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .option-btn {
+      flex: 1;
+      min-width: 140px;
+      padding: 16px 20px;
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text);
+      cursor: pointer;
+      font-size: 0.9rem;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      transition: all 0.15s;
+      text-align: center;
+    }
+
+    .option-btn:hover:not(:disabled) {
+      border-color: var(--red);
+      color: var(--red);
+      background: #e6394610;
+    }
+
+    .option-btn.correct {
+      border-color: var(--green);
+      color: var(--green);
+      background: #2ecc7115;
+    }
+
+    .option-btn.wrong {
+      border-color: var(--red);
+      color: var(--red);
+      background: #e6394615;
+    }
+
+    .option-btn:disabled { cursor: default; }
+
+    /* ── FEEDBACK ── */
+    .feedback {
+      display: none;
+      margin-top: 20px;
+      padding: 18px 20px;
+      border-radius: 2px;
+      font-size: 0.88rem;
+      line-height: 1.7;
+    }
+
+    .feedback.show { display: block; }
+    .feedback.correct { background: #2ecc7115; border: 1px solid #2ecc7130; }
+    .feedback.wrong { background: #e6394615; border: 1px solid #e6394630; }
+
+    .feedback strong {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 1rem;
+    }
+
+    .feedback.correct strong { color: var(--green); }
+    .feedback.wrong strong { color: var(--red); }
+
+    /* ── NEXT BUTTON ── */
+    .next-btn {
+      display: none;
+      margin-top: 20px;
+      width: 100%;
+      padding: 16px;
+      background: var(--red);
+      color: #fff;
+      border: none;
+      cursor: pointer;
+      font-size: 0.9rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      transition: opacity 0.2s;
+    }
+
+    .next-btn:hover { opacity: 0.85; }
+    .next-btn.show { display: block; }
+
+    /* ── RESULTS ── */
+    #resultsScreen {
+      display: none;
+      text-align: center;
+      padding: 60px 24px;
+    }
+
+    #resultsScreen.show { display: block; }
+
+    .score-circle {
+      width: 160px;
+      height: 160px;
+      border: 4px solid var(--red);
+      border-radius: 50%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 32px;
+    }
+
+    .score-num {
+      font-size: 3rem;
+      font-weight: 900;
+      color: var(--red);
+      line-height: 1;
+    }
+
+    .score-label {
+      font-size: 0.75rem;
+      color: var(--muted);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+
+    .result-title {
+      font-size: 1.6rem;
+      font-weight: 900;
+      margin-bottom: 12px;
+    }
+
+    .result-msg {
+      color: var(--muted);
+      font-size: 0.95rem;
+      line-height: 1.7;
+      max-width: 500px;
+      margin: 0 auto 32px;
+    }
+
+    .stat-reveal {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      padding: 28px;
+      max-width: 500px;
+      margin: 0 auto 32px;
+    }
+
+    .stat-reveal h3 {
+      font-size: 0.7rem;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--red);
+      margin-bottom: 16px;
+    }
+
+    .stat-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.85rem;
+    }
+
+    .stat-row:last-child { border-bottom: none; }
+    .stat-row .val { font-weight: 900; color: var(--red); font-size: 1.1rem; }
+
+    .restart-btn {
+      padding: 14px 32px;
+      background: transparent;
+      border: 1px solid var(--red);
+      color: var(--red);
+      cursor: pointer;
+      font-size: 0.9rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      transition: all 0.2s;
+      margin-right: 12px;
+    }
+
+    .restart-btn:hover { background: #e6394615; }
+
+    .home-btn {
+      display: inline-block;
+      padding: 14px 32px;
+      background: var(--red);
+      color: #fff;
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+
+    /* ── INTRO ── */
+    #introScreen {
+      max-width: 600px;
+      margin: 60px auto;
+      padding: 0 24px;
+      text-align: center;
+    }
+
+    #introScreen h2 {
+      font-size: 1.6rem;
+      font-weight: 900;
+      margin-bottom: 16px;
+    }
+
+    #introScreen p {
+      color: var(--muted);
+      line-height: 1.7;
+      margin-bottom: 12px;
+    }
+
+    .start-btn {
+      display: inline-block;
+      margin-top: 24px;
+      padding: 18px 48px;
+      background: var(--red);
+      color: #fff;
+      border: none;
+      cursor: pointer;
+      font-size: 1rem;
+      font-weight: 900;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      transition: opacity 0.2s;
+    }
+
+    .start-btn:hover { opacity: 0.85; }
+  </style>
+</head>
+<body>
+
+  <div class="header" style="position:relative">
+    <a class="back" href="../index.html">← Πίσω</a>
+    <h1>Μπορείς να το <span>ξεχωρίσεις</span>;</h1>
+    <p>Αληθινό ή AI; 8 ερωτήσεις που αποδεικνύουν πόσο εύκολα μας εξαπατά η τεχνολογία.</p>
+  </div>
+
+  <!-- INTRO -->
+  <div id="introScreen">
+    <h2>Πριν ξεκινήσεις</h2>
+    <p>Θα σου δείξω αποσπάσματα από emails, μηνύματα, ειδήσεις και περιγραφές ήχου/βίντεο.</p>
+    <p>Απάντησε αν πιστεύεις ότι είναι <strong>αληθινά</strong> ή δημιουργήθηκαν από <strong>AI</strong>.</p>
+    <p style="color: var(--red); font-size: 0.85rem;">Η μέση ανθρώπινη επιτυχία: <strong>24,5%</strong> σωστά. Μπορείς να τα πας καλύτερα;</p>
+    <button class="start-btn" onclick="startQuiz()">ΞΕΚΙΝΑ ΤΟ QUIZ</button>
+  </div>
+
+  <!-- QUIZ -->
+  <div class="quiz-wrap" id="quizScreen" style="display:none">
+
+    <div class="progress-bar-wrap">
+      <div class="progress-meta">
+        <span id="qCounter">Ερώτηση 1 από 8</span>
+        <span id="scoreDisplay">Σκορ: 0</span>
+      </div>
+      <div class="progress-bar">
+        <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+      </div>
+    </div>
+
+    <div id="questionArea"></div>
+
+  </div>
+
+  <!-- RESULTS -->
+  <div id="resultsScreen">
+    <div class="score-circle">
+      <div class="score-num" id="finalScore">0</div>
+      <div class="score-label">/ 8 σωστά</div>
+    </div>
+    <div class="result-title" id="resultTitle"></div>
+    <div class="result-msg" id="resultMsg"></div>
+
+    <div class="stat-reveal">
+      <h3>Η Πραγματικότητα</h3>
+      <div class="stat-row">
+        <span>Ανθρώπινη ακρίβεια αναγνώρισης deepfake</span>
+        <span class="val">24,5%</span>
+      </div>
+      <div class="stat-row">
+        <span>Deepfakes "σχεδόν αδύνατο να διακριθούν"</span>
+        <span class="val">68%</span>
+      </div>
+      <div class="stat-row">
+        <span>Κλώνος φωνής από δευτερόλεπτα ήχου</span>
+        <span class="val">3 sec</span>
+      </div>
+      <div class="stat-row">
+        <span>Deepfake απόπειρα κάθε...</span>
+        <span class="val">5 λεπτά</span>
+      </div>
+      <div class="stat-row">
+        <span>Απώλειες από AI fraud 2024 (FBI IC3)</span>
+        <span class="val">$16,6B</span>
+      </div>
+    </div>
+
+    <button class="restart-btn" onclick="restartQuiz()">ΠΑΙΞΕ ΞΑΝΑ</button>
+    <a class="home-btn" href="../index.html">← Κεντρική</a>
+  </div>
+
+  <script>
+    const questions = [
+      {
+        category: "Email & Phishing",
+        text: "Αυτό το email έλαβε υπάλληλος της εταιρείας. Πιστεύεις ότι το έγραψε άνθρωπος ή AI;",
+        excerpt: `Αγαπητέ κ. Παπαδόπουλε,
+
+Ελπίζω να είστε καλά. Σας γράφω εκ μέρους του διευθύνοντος συμβούλου, ο οποίος βρίσκεται σε επείγουσα σύσκεψη και ζήτησε να σας επικοινωνήσω άμεσα.
+
+Λόγω μιας εκτός προγραμματισμού εξαγοράς, απαιτείται η εξουσιοδότηση μεταφοράς €87.000 μέχρι σήμερα στις 17:00. Ο κ. Νικολάου έχει ήδη εγκρίνει. Η συναλλαγή πρέπει να παραμείνει εμπιστευτική έως ότου ολοκληρωθεί η νομική διαδικασία.
+
+Τα στοιχεία λογαριασμού θα σας αποσταλούν σε λίγα λεπτά.
+
+Με εκτίμηση,
+Μαρία Αντωνίου
+Γραμματεία Διοίκησης`,
+        answer: "AI",
+        options: ["Άνθρωπος", "AI"],
+        feedback: {
+          correct: "Σωστά! Αυτό είναι BEC (Business Email Compromise) δημιουργημένο με AI. Σημάδια: επείγον + εμπιστευτικότητα + πίεση χρόνου + παράκαμψη κανονικών διαδικασιών. Τέτοια emails έχουν κοστίσει εταιρείες εκατ. ευρώ.",
+          wrong: "Λάθος. Αυτό είναι AI-generated BEC email. Τα σημάδια: τεχνητή επείγουσα ανάγκη, εμπιστευτικότητα, παράκαμψη κανονικής έγκρισης. Το AI γράφει τέτοια emails σε δευτερόλεπτα και στην οποιαδήποτε γλώσσα."
+        }
+      },
+      {
+        category: "Deepfake Βίντεο",
+        text: "Σε ένα video call, ένας 'CFO' ζήτησε από υπάλληλο να εγκρίνει μεταφορά $25 εκατομμυρίων. Τι ήταν στην πραγματικότητα;",
+        excerpt: `Η κλήση φαινόταν τέλεια φυσιολογική. Στην οθόνη: ο CFO της εταιρείας, οικεία πρόσωπα από τη διοίκηση, πραγματικοί συνάδελφοι. Ο ήχος ήταν καθαρός, τα πρόσωπα αναγνωρίσιμα. Ο υπάλληλος αναγνώρισε τον CFO αμέσως — τον γνώριζε χρόνια.
+
+Η μεταφορά εγκρίθηκε.`,
+        answer: "AI",
+        options: ["Πραγματικοί άνθρωποι", "Deepfake AI"],
+        feedback: {
+          correct: "Σωστά! Αυτό είναι το πραγματικό περιστατικό Arup / Hong Kong (Φεβρουάριος 2024). Ολόκληρη η video call ήταν deepfake — CFO, συνάδελφοι, όλοι. Ζημία: $25 εκατομμύρια.",
+          wrong: "Λάθος. Ήταν deepfake — πραγματικό περιστατικό: Arup, Φεβρ. 2024. Όλοι στην κλήση ήταν AI-generated. Ζημία: $25 εκατομμύρια. Η εταιρεία ήταν πραγματική. Ο υπάλληλος γνώριζε τον CFO χρόνια."
+        }
+      },
+      {
+        category: "AI Φιλία & Romance Scam",
+        text: "Ένας χρήστης μιλούσε μήνες με αυτόν τον 'φίλο' στο Facebook. Ποιος ήταν;",
+        excerpt: `"Γεια σου! Είδα το προφίλ σου και μου φάνηκες πολύ ενδιαφέρον άνθρωπος. Είμαι χειρουργός στο Médecins Sans Frontières, τώρα σε αποστολή στη Συρία. Είναι μοναχικό εδώ... χαίρομαι που μπορώ να μιλώ με κάποιον σαν κι εσένα.
+
+Ξέρω ότι είναι νωρίς, αλλά νιώθω ότι σε καταλαβαίνω. Μπορώ να σε πάρω τηλέφωνο σύντομα;"`,
+        answer: "AI",
+        options: ["Πραγματικός άνθρωπος", "AI Bot"],
+        feedback: {
+          correct: "Σωστά! Αυτό είναι τυπικό 'pig butchering' — AI chatbot που προσποιείται γιατρό/στρατιωτικό σε αποστολή. Ο χρόνος εκτός + η ευαλωτότητα + η σταδιακή εμπιστοσύνη είναι το μοτίβο. Ένα τέτοιο scam κόστισε $280.000 σε θύμα.",
+          wrong: "Λάθος. AI Bot — τυπικό 'pig butchering'. Σημάδια: εξωτικό επάγγελμα, αποστολή σε δύσκολη χώρα, γρήγορη συναισθηματική σύνδεση, πρόταση για τηλεφωνική επικοινωνία (συνήθως φωνητικός κλώνος). Ζημία σε πραγματική υπόθεση: $280.000."
+        }
+      },
+      {
+        category: "Κλωνοποίηση Φωνής",
+        text: "Ένας πατέρας έλαβε τηλεφώνημα: η κόρη του έκλαιγε και ζητούσε λύτρα. Τι άκουσε;",
+        excerpt: `Τηλεφώνημα, 23:15.
+
+«Μπαμπά; Μπαμπά, σε παρακαλώ βοήθησέ με, με κρατούν...»
+
+Η φωνή ήταν της κόρης του — ο τρόπος που μιλούσε, οι λεπτομέρειες της προφοράς, ακόμα και ο τρόπος που τον φώναζε. Αμέσως μετά: ανδρική φωνή που απαιτούσε $15.000 σε 2 ώρες.
+
+Η κόρη του κοιμόταν στο δίπλα δωμάτιο.`,
+        answer: "AI",
+        options: ["Πραγματική φωνή", "AI Κλώνος"],
+        feedback: {
+          correct: "Σωστά! Voice cloning scam — από 3 δευτερόλεπτα ήχου (π.χ. από social media) αρκεί για κλώνο 85% ακρίβεια. Αυτό το είδος απάτης εκτοξεύτηκε +1.740% στη Βόρεια Αμερική.",
+          wrong: "Λάθος. AI κλώνος φωνής. Αρκούν 3 δευτερόλεπτα ήχου από social media. Το AI αναπαράγει τον τόνο, την προφορά, ακόμα και τα συναισθήματα. Αυτή η απάτη αυξήθηκε +1.740% στη Βόρεια Αμερική το 2024."
+        }
+      },
+      {
+        category: "Πολιτική Χειραγωγήση",
+        text: "Λίγες μέρες πριν τις εκλογές στη Νέα Υόρκη, χιλιάδες ψηφοφόροι έλαβαν αυτό το robocall. Τι ήταν;",
+        excerpt: `«Γεια σας, εδώ ο Joe Biden. Ξέρω ότι σκεφτόμαστε όλοι να ψηφίσουμε στις προκριματικές της Τρίτης — αλλά να ψηφίσουμε στις κανονικές εκλογές τον Νοέμβριο. Αποθηκεύστε την ψήφο σας για τότε.»`,
+        answer: "AI",
+        options: ["Επίσημο μήνυμα Biden", "AI Deepfake"],
+        feedback: {
+          correct: "Σωστά! Πραγματικό περιστατικό: New Hampshire, Ιανουάριος 2024. AI robocalls με κλωνοποιημένη φωνή Biden που απέτρεπαν ψηφοφόρους να ψηφίσουν. Η FCC έκρινε παράνομο μετά την πράξη.",
+          wrong: "Λάθος. AI deepfake — πραγματικό περιστατικό New Hampshire 2024. Κλωνοποιημένη φωνή Biden σε robocalls για αποτροπή ψηφοφόρων. Η φωνή ήταν τόσο πιστή που πολλοί το πίστεψαν."
+        }
+      },
+      {
+        category: "Ψεύτικη Ταυτότητα",
+        text: "Μια εταιρεία κυβερνοασφάλειας προσέλαβε έναν μηχανικό μετά από βιντεοσυνέντευξη. Τι ανακάλυψε;",
+        excerpt: `Η βιντεοσυνέντευξη πήγε άριστα. Το βιογραφικό ήταν άψογο, οι απαντήσεις τεχνικά ακριβείς. Το πρόσωπο στην οθόνη φαινόταν νορεοκορεάτης νέος επαγγελματίας — ακριβώς όπως έδειχνε στο LinkedIn.
+
+Την πρώτη ημέρα εργασίας, η ομάδα IT εντόπισε ύποπτη δραστηριότητα στο laptop. Ο "νέος μηχανικός" δεν υπήρχε πουθενά.`,
+        answer: "AI",
+        options: ["Πραγματικός υπάλληλος", "AI Deepfake + Βορειοκορεάτης χάκερ"],
+        feedback: {
+          correct: "Σωστά! Αυτό είναι το πραγματικό περιστατικό KnowBe4 (2024) — εταιρεία κυβερνοασφάλειας προσέλαβε Βορειοκορεάτη χάκερ που χρησιμοποίησε deepfake για τη συνέντευξη. Περιστατικά impersonation +148% το 2024.",
+          wrong: "Λάθος. Πραγματικό περιστατικό KnowBe4 (2024): Βορειοκορεάτης χάκερ με deepfake βιντεοσυνέντευξη. Η εταιρεία ήταν εταιρεία κυβερνοασφάλειας. Impersonation scams +148% το 2024, απώλειες $2,95 δισ."
+        }
+      },
+      {
+        category: "AI Κείμενο",
+        text: "Αυτό το κομμάτι γράφτηκε για ειδησεογραφικό site. Ποιος το έγραψε;",
+        excerpt: `Η ραγδαία εξέλιξη της τεχνητής νοημοσύνης θέτει νέα ηθικά ερωτήματα που η κοινωνία καλείται να αντιμετωπίσει. Εμπειρογνώμονες επισημαίνουν ότι η ισορροπία μεταξύ καινοτομίας και ασφάλειας αποτελεί κρίσιμη πρόκληση για τα επόμενα χρόνια, ενώ διεθνείς οργανισμοί εντείνουν τις προσπάθειες για τη θέσπιση κοινών κανόνων.`,
+        answer: "AI",
+        options: ["Δημοσιογράφος", "AI"],
+        feedback: {
+          correct: "Σωστά! AI-generated — σημάδια: γενικόλογη γλώσσα, μηδενική συγκεκριμένη πληροφορία, κλισέ φράσεις ('ραγδαία εξέλιξη', 'κρίσιμη πρόκληση'). Αυτό το πρόβλημα λέγεται 'AI slop' — περιεχόμενο που φαίνεται σωστό αλλά δεν λέει τίποτα.",
+          wrong: "Λάθος. AI-generated. Σημάδια: χωρίς συγκεκριμένα γεγονότα, χωρίς πηγές, κλισέ γλώσσα. Το Google Bard παρήγαγε παραπληροφόρηση σε 78/100 ευαίσθητες ερωτήσεις χωρίς disclaimer (CCDH test 2024)."
+        }
+      },
+      {
+        category: "Συνδυαστικό",
+        text: "Τελευταία ερώτηση: Ποιο από αυτά είναι ΠΡΑΓΜΑΤΙΚΟ γεγονός του 2024;",
+        excerpt: `Α) Ένα AI deepfake του Elon Musk συγκέντρωσε $5 εκατ. από θύματα επενδυτικής απάτης.
+
+Β) Η Ρουμανία ακύρωσε τα εκλογικά αποτελέσματα λόγω AI-powered εκλογικής παρέμβασης.
+
+Γ) Η πόλη Arlington έχασε $446.000 από AI email που παρίστανε προμηθευτή.
+
+Δ) Όλα τα παραπάνω είναι αληθινά.`,
+        answer: "Δ",
+        options: ["Μόνο το Α", "Μόνο το Β και Γ", "Δ — Όλα αληθινά", "Κανένα δεν είναι αληθινό"],
+        feedback: {
+          correct: "Σωστά! Και τα τρία είναι πραγματικά γεγονότα του 2024. Αυτή είναι η πραγματικότητα που αντιμετωπίζουμε — όχι σενάρια επιστημονικής φαντασίας.",
+          wrong: "Λάθος — και τα τρία είναι αληθινά γεγονότα 2024. Elon Musk deepfake: $5 εκατ. απώλειες. Ρουμανία: ακύρωση εκλογών. Arlington: $446.000. Η AI απάτη δεν είναι θεωρητική απειλή."
+        }
+      }
+    ];
+
+    let current = 0;
+    let score = 0;
+    let answered = false;
+
+    function startQuiz() {
+      document.getElementById('introScreen').style.display = 'none';
+      document.getElementById('quizScreen').style.display = 'block';
+      renderQuestion();
+    }
+
+    function renderQuestion() {
+      const q = questions[current];
+      answered = false;
+
+      document.getElementById('qCounter').textContent = `Ερώτηση ${current + 1} από ${questions.length}`;
+      document.getElementById('scoreDisplay').textContent = `Σκορ: ${score}`;
+      document.getElementById('progressFill').style.width = `${(current / questions.length) * 100}%`;
+
+      const html = `
+        <div class="question-card">
+          <div class="q-category">${q.category}</div>
+          <div class="q-text">${q.text}</div>
+          <div class="q-excerpt">${q.excerpt.replace(/\n/g, '<br>')}</div>
+          <div class="options">
+            ${q.options.map((opt, i) => `
+              <button class="option-btn" onclick="answer(this, '${opt.replace(/'/g, "\\'")}')">
+                ${opt}
+              </button>
+            `).join('')}
+          </div>
+          <div class="feedback" id="feedback"></div>
+          <button class="next-btn" id="nextBtn" onclick="nextQuestion()">
+            ${current < questions.length - 1 ? 'Επόμενη →' : 'Δες το αποτέλεσμα →'}
+          </button>
+        </div>
+      `;
+
+      document.getElementById('questionArea').innerHTML = html;
+    }
+
+    function answer(btn, choice) {
+      if (answered) return;
+      answered = true;
+
+      const q = questions[current];
+      const allBtns = document.querySelectorAll('.option-btn');
+      allBtns.forEach(b => b.disabled = true);
+
+      const isCorrect = choice === q.answer ||
+        (q.answer === "AI" && (choice === "AI" || choice === "AI Bot" || choice === "AI Κλώνος" || choice === "AI Deepfake" || choice === "Deepfake AI" || choice === "AI")) ||
+        (q.answer === "Δ" && choice === "Δ — Όλα αληθινά");
+
+      const feedbackEl = document.getElementById('feedback');
+      const nextBtn = document.getElementById('nextBtn');
+
+      if (isCorrect) {
+        btn.classList.add('correct');
+        score++;
+        feedbackEl.innerHTML = `<strong>✓ Σωστά!</strong>${q.feedback.correct}`;
+        feedbackEl.className = 'feedback correct show';
+      } else {
+        btn.classList.add('wrong');
+        allBtns.forEach(b => {
+          if (b.textContent.trim() === q.answer ||
+              b.textContent.trim() === "AI" ||
+              b.textContent.trim() === "AI Bot" ||
+              b.textContent.trim() === "AI Κλώνος" ||
+              b.textContent.trim() === "AI Deepfake" ||
+              b.textContent.trim() === "Deepfake AI" ||
+              b.textContent.trim() === "Δ — Όλα αληθινά") {
+            b.classList.add('correct');
+          }
+        });
+        feedbackEl.innerHTML = `<strong>✗ Λάθος.</strong>${q.feedback.wrong}`;
+        feedbackEl.className = 'feedback wrong show';
+      }
+
+      document.getElementById('scoreDisplay').textContent = `Σκορ: ${score}`;
+      nextBtn.classList.add('show');
+    }
+
+    function nextQuestion() {
+      current++;
+      if (current >= questions.length) {
+        showResults();
+      } else {
+        renderQuestion();
+      }
+    }
+
+    function showResults() {
+      document.getElementById('quizScreen').style.display = 'none';
+      const rs = document.getElementById('resultsScreen');
+      rs.classList.add('show');
+
+      document.getElementById('finalScore').textContent = score;
+
+      let title, msg;
+      if (score <= 2) {
+        title = "Ο Trusty Devil σε κέρδισε.";
+        msg = "Κανείς δεν είναι απρόσβλητος. Η AI χτίζει εμπιστοσύνη πριν χτυπήσει — αυτό ακριβώς κάνει τόσο επικίνδυνη.";
+      } else if (score <= 4) {
+        title = "Μισός δρόμος.";
+        msg = "Μερικά ξεχώρισες — αλλά στον πραγματικό κόσμο δεν έχεις χρόνο να σκεφτείς. Τα AI scams χτυπούν γρήγορα και σε στιγμές αδυναμίας.";
+      } else if (score <= 6) {
+        title = "Πάνω από τον μέσο όρο.";
+        msg = "Τα πήγες καλύτερα από 75% των ανθρώπων. Αλλά θυμήσου: 24,5% είναι ο μέσος όρος — και οι απατεώνες το γνωρίζουν.";
+      } else {
+        title = "Εξαιρετικό σκορ.";
+        msg = "Εντοπίζεις τα σήματα κινδύνου. Μοίρασε αυτή τη γνώση — κάθε άτομο που ξέρει να αναγνωρίζει τα σημάδια είναι ένα λιγότερο πιθανό θύμα.";
+      }
+
+      document.getElementById('resultTitle').textContent = title;
+      document.getElementById('resultMsg').textContent = msg;
+    }
+
+    function restartQuiz() {
+      current = 0;
+      score = 0;
+      answered = false;
+      document.getElementById('resultsScreen').classList.remove('show');
+      document.getElementById('quizScreen').style.display = 'block';
+      renderQuestion();
+    }
+  </script>
+
+</body>
+</html>
