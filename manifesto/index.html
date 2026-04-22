@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="el">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -32,6 +32,39 @@
       font-size: 0.75rem;
       letter-spacing: 2px;
       text-transform: uppercase;
+    }
+
+    /* ── LANG TOGGLE ── */
+    .lang-toggle {
+      position: absolute;
+      top: 16px;
+      left: 16px;
+      display: flex;
+      border: 1px solid var(--gold);
+      overflow: hidden;
+      font-family: 'Segoe UI', sans-serif;
+      z-index: 10;
+    }
+
+    .lang-btn {
+      padding: 5px 12px;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+      color: var(--muted);
+      transition: all 0.2s;
+    }
+
+    .lang-btn + .lang-btn {
+      border-left: 1px solid var(--gold);
+    }
+
+    .lang-btn.active {
+      background: var(--blue);
+      color: #fff;
     }
 
     /* ── DOCUMENT WRAPPER ── */
@@ -87,9 +120,7 @@
       background: linear-gradient(135deg, #fffbe6, #f5edd0);
     }
 
-    .org-name {
-      text-align: left;
-    }
+    .org-name { text-align: left; }
 
     .org-name .main {
       font-size: 1.1rem;
@@ -130,9 +161,7 @@
     }
 
     /* ── BODY ── */
-    .section {
-      margin-bottom: 36px;
-    }
+    .section { margin-bottom: 36px; }
 
     .section-title {
       font-size: 0.7rem;
@@ -144,12 +173,6 @@
       margin-bottom: 16px;
     }
 
-    .section h2 {
-      font-size: 1.1rem;
-      color: var(--blue);
-      margin-bottom: 10px;
-    }
-
     p {
       font-size: 0.92rem;
       line-height: 1.9;
@@ -157,10 +180,7 @@
       margin-bottom: 12px;
     }
 
-    /* Hollow paragraph — looks official, means nothing */
-    p.hollow {
-      color: #444;
-    }
+    p.hollow { color: #444; }
 
     /* ── PRINCIPLES BOX ── */
     .principles {
@@ -214,15 +234,12 @@
       margin-top: 20px;
     }
 
-    .signatory {
-      text-align: center;
-    }
+    .signatory { text-align: center; }
 
     .sig-line {
       border-bottom: 1px solid #aaa;
       height: 40px;
       margin-bottom: 6px;
-      position: relative;
     }
 
     .sig-name {
@@ -289,10 +306,7 @@
       margin-bottom: 6px;
     }
 
-    .expose-item .truth {
-      color: #e8e8e8;
-    }
-
+    .expose-item .truth { color: #e8e8e8; }
     .expose-item .truth strong { color: #e63946; }
 
     /* ── FOOTER ── */
@@ -322,42 +336,49 @@
       .document { padding: 32px 24px 48px; }
       .signatories { grid-template-columns: 1fr; }
       .doc-meta { flex-direction: column; gap: 4px; }
+      .lang-toggle { top: 8px; left: 8px; }
     }
   </style>
 </head>
 <body>
 
-  <div class="top-bar">Global AI Ethics Council &nbsp;·&nbsp; Official Document &nbsp;·&nbsp; Version 4.2 — Ratified 2026</div>
+  <div class="top-bar" data-i18n="topBar">Global AI Ethics Council &nbsp;·&nbsp; Official Document &nbsp;·&nbsp; Version 4.2 — Ratified 2026</div>
 
   <div class="document">
+
+    <!-- LANGUAGE TOGGLE -->
+    <div class="lang-toggle">
+      <button class="lang-btn active" id="btnEN" onclick="setLang('en')">EN</button>
+      <button class="lang-btn" id="btnEL" onclick="setLang('el')">ΕΛ</button>
+    </div>
 
     <div class="doc-header">
       <div class="logo-area">
         <div class="seal">⚖️</div>
         <div class="org-name">
-          <div class="main">Global AI Ethics Council</div>
-          <div class="sub">Established 2021 &nbsp;·&nbsp; Geneva, Switzerland</div>
+          <div class="main" data-i18n="orgMain">Global AI Ethics Council</div>
+          <div class="sub" data-i18n="orgSub">Established 2021 &nbsp;·&nbsp; Geneva, Switzerland</div>
         </div>
       </div>
-      <div class="doc-title">The Trustworthy AI Manifesto</div>
-      <div class="doc-subtitle">A Universal Framework for Responsible, Transparent and Human-Centric Artificial Intelligence</div>
+      <div class="doc-title" data-i18n="docTitle">The Trustworthy AI Manifesto</div>
+      <div class="doc-subtitle" data-i18n="docSubtitle">A Universal Framework for Responsible, Transparent and Human-Centric Artificial Intelligence</div>
       <div class="doc-meta">
-        <span>Document ID: GAEC-2026-TDM-v4.2</span>
-        <span>Classification: Public Release</span>
-        <span>Date: April 2026</span>
+        <span data-i18n="metaId">Document ID: GAEC-2026-TDM-v4.2</span>
+        <span data-i18n="metaClass">Classification: Public Release</span>
+        <span data-i18n="metaDate">Date: April 2026</span>
       </div>
     </div>
 
     <!-- PREAMBLE -->
     <div class="section">
-      <div class="section-title">Preamble</div>
-      <p class="hollow">
+      <div class="section-title" data-i18n="secPreamble">Preamble</div>
+      <p class="hollow" data-i18n="preamble1">
         We, the undersigned representatives of governments, civil society organizations, and leading
         technology enterprises, hereby affirm our collective commitment to the advancement of
         Artificial Intelligence systems that embody the highest standards of ethical conduct,
         human dignity, and societal benefit.
       </p>
-      <p class="hollow">
+      <p class="hollow" data-i18n="preamble2">
         Recognizing that AI technologies present both extraordinary opportunities and unprecedented
         challenges, this Manifesto establishes a robust, multi-stakeholder governance framework
         designed to ensure that innovation proceeds in alignment with shared human values,
@@ -367,92 +388,78 @@
 
     <!-- PRINCIPLES -->
     <div class="section">
-      <div class="section-title">Core Principles</div>
+      <div class="section-title" data-i18n="secPrinciples">Core Principles</div>
 
       <div class="principles">
-        <h3>The Seven Pillars of Trustworthy AI</h3>
+        <h3 data-i18n="pillarsTitle">The Seven Pillars of Trustworthy AI</h3>
 
         <div class="principle">
           <div class="principle-num">I</div>
           <div class="principle-text">
-            <strong>Transparency</strong>
-            <span>
-              All AI systems shall operate with appropriate levels of explainability, proportionate
+            <strong data-i18n="p1Title">Transparency</strong>
+            <span data-i18n="p1Text">All AI systems shall operate with appropriate levels of explainability, proportionate
               to context and risk, within the boundaries established by applicable intellectual
-              property protections and competitive confidentiality requirements.
-            </span>
+              property protections and competitive confidentiality requirements.</span>
           </div>
         </div>
 
         <div class="principle">
           <div class="principle-num">II</div>
           <div class="principle-text">
-            <strong>Accountability</strong>
-            <span>
-              Responsibility for AI outcomes shall be clearly attributable to designated
+            <strong data-i18n="p2Title">Accountability</strong>
+            <span data-i18n="p2Text">Responsibility for AI outcomes shall be clearly attributable to designated
               stakeholders, subject to jurisdictional variance and the limitations inherent
-              in complex sociotechnical systems where causality may be distributed.
-            </span>
+              in complex sociotechnical systems where causality may be distributed.</span>
           </div>
         </div>
 
         <div class="principle">
           <div class="principle-num">III</div>
           <div class="principle-text">
-            <strong>Fairness</strong>
-            <span>
-              AI systems shall strive toward equitable outcomes, acknowledging that fairness
+            <strong data-i18n="p3Title">Fairness</strong>
+            <span data-i18n="p3Text">AI systems shall strive toward equitable outcomes, acknowledging that fairness
               is a multi-dimensional construct requiring trade-offs between competing definitions
-              that may not be simultaneously satisfiable in all deployment contexts.
-            </span>
+              that may not be simultaneously satisfiable in all deployment contexts.</span>
           </div>
         </div>
 
         <div class="principle">
           <div class="principle-num">IV</div>
           <div class="principle-text">
-            <strong>Privacy</strong>
-            <span>
-              User data shall be processed in accordance with prevailing regulatory frameworks,
+            <strong data-i18n="p4Title">Privacy</strong>
+            <span data-i18n="p4Text">User data shall be processed in accordance with prevailing regulatory frameworks,
               with collection limited to what is necessary for service delivery and
-              the continuous improvement of AI capabilities.
-            </span>
+              the continuous improvement of AI capabilities.</span>
           </div>
         </div>
 
         <div class="principle">
           <div class="principle-num">V</div>
           <div class="principle-text">
-            <strong>Safety</strong>
-            <span>
-              AI systems shall be designed to minimize foreseeable harms, with risk assessments
+            <strong data-i18n="p5Title">Safety</strong>
+            <span data-i18n="p5Text">AI systems shall be designed to minimize foreseeable harms, with risk assessments
               conducted at product launch and reviewed periodically in accordance with
-              organizational capacity and market conditions.
-            </span>
+              organizational capacity and market conditions.</span>
           </div>
         </div>
 
         <div class="principle">
           <div class="principle-num">VI</div>
           <div class="principle-text">
-            <strong>Inclusivity</strong>
-            <span>
-              Development processes should endeavor to incorporate diverse perspectives
+            <strong data-i18n="p6Title">Inclusivity</strong>
+            <span data-i18n="p6Text">Development processes should endeavor to incorporate diverse perspectives
               where practicable, subject to timeline and resource constraints
-              of individual development cycles.
-            </span>
+              of individual development cycles.</span>
           </div>
         </div>
 
         <div class="principle">
           <div class="principle-num">VII</div>
           <div class="principle-text">
-            <strong>Sustainability</strong>
-            <span>
-              AI development shall consider long-term environmental impact, with organizations
+            <strong data-i18n="p7Title">Sustainability</strong>
+            <span data-i18n="p7Text">AI development shall consider long-term environmental impact, with organizations
               committing to publish annual sustainability reports outlining progress
-              toward aspirational emissions targets.
-            </span>
+              toward aspirational emissions targets.</span>
           </div>
         </div>
       </div>
@@ -460,13 +467,13 @@
 
     <!-- ENFORCEMENT -->
     <div class="section">
-      <div class="section-title">Enforcement & Compliance</div>
-      <p class="hollow">
+      <div class="section-title" data-i18n="secEnforcement">Enforcement &amp; Compliance</div>
+      <p class="hollow" data-i18n="enforce1">
         Compliance with this Manifesto is voluntary for all signatories. Organizations are
         encouraged to self-assess their alignment with the stated principles on an annual basis
         and to report findings through the Council's online disclosure portal.
       </p>
-      <p class="hollow">
+      <p class="hollow" data-i18n="enforce2">
         The Council shall convene annually to review this framework and may issue non-binding
         guidance documents to assist member organizations in their implementation efforts.
         Disputes arising from interpretation of these principles shall be referred to a
@@ -476,25 +483,25 @@
 
     <!-- SIGNATORIES -->
     <div class="section">
-      <div class="section-title">Signatories</div>
-      <p style="font-size:0.8rem; color: var(--muted); margin-bottom: 20px;">
+      <div class="section-title" data-i18n="secSignatories">Signatories</div>
+      <p style="font-size:0.8rem; color: var(--muted); margin-bottom: 20px;" data-i18n="sigIntro">
         The following organizations have endorsed this Manifesto as of April 2026:
       </p>
       <div class="signatories">
         <div class="signatory">
           <div class="sig-line"></div>
           <div class="sig-name">Dr. Helena Voss</div>
-          <div class="sig-title">Chair, Global AI Ethics Council</div>
+          <div class="sig-title" data-i18n="sig1Title">Chair, Global AI Ethics Council</div>
         </div>
         <div class="signatory">
           <div class="sig-line"></div>
           <div class="sig-name">Prof. James R. Thornton</div>
-          <div class="sig-title">Director, AI Policy Institute</div>
+          <div class="sig-title" data-i18n="sig2Title">Director, AI Policy Institute</div>
         </div>
         <div class="signatory">
           <div class="sig-line"></div>
           <div class="sig-name">Yuki Nakamura</div>
-          <div class="sig-title">VP Trust & Safety, NexaAI Corp.</div>
+          <div class="sig-title" data-i18n="sig3Title">VP Trust &amp; Safety, NexaAI Corp.</div>
         </div>
       </div>
     </div>
@@ -559,21 +566,116 @@
       <br>
       <div style="color: #e63946; text-align: center; font-size: 0.9rem; letter-spacing: 1px;">
         ——— Trusty Devil — AntIhackathon 2026 — Zone01 Athens ———<br>
-        <span style="color: #888; font-size: 0.8rem;">Αυτό το έγγραφο είναι εκπαιδευτική προσομοίωση. Διδάξκει πώς να αναγνωρίζεις AI washing.</span>
+        <span style="color: #888; font-size: 0.8rem;">Αυτό το έγγραφο είναι εκπαιδευτική προσομοίωση. Διδάσκει πώς να αναγνωρίζεις AI washing.</span>
       </div>
     </div>
 
     <a class="back-link" href="../index.html">← Πίσω στο Trusty Devil</a>
 
     <div class="doc-footer">
-      <span>© 2026 Global AI Ethics Council (fictional)</span>
+      <span data-i18n="footerLeft">© 2026 Global AI Ethics Council (fictional)</span>
       <span>GAEC-2026-TDM-v4.2</span>
-      <span>For educational use — AntIhackathon 2026</span>
+      <span data-i18n="footerRight">For educational use — AntIhackathon 2026</span>
     </div>
 
   </div>
 
   <script>
+    const i18n = {
+      en: {
+        topBar:       'Global AI Ethics Council &nbsp;·&nbsp; Official Document &nbsp;·&nbsp; Version 4.2 — Ratified 2026',
+        orgMain:      'Global AI Ethics Council',
+        orgSub:       'Established 2021 &nbsp;·&nbsp; Geneva, Switzerland',
+        docTitle:     'The Trustworthy AI Manifesto',
+        docSubtitle:  'A Universal Framework for Responsible, Transparent and Human-Centric Artificial Intelligence',
+        metaId:       'Document ID: GAEC-2026-TDM-v4.2',
+        metaClass:    'Classification: Public Release',
+        metaDate:     'Date: April 2026',
+        secPreamble:  'Preamble',
+        preamble1:    'We, the undersigned representatives of governments, civil society organizations, and leading technology enterprises, hereby affirm our collective commitment to the advancement of Artificial Intelligence systems that embody the highest standards of ethical conduct, human dignity, and societal benefit.',
+        preamble2:    'Recognizing that AI technologies present both extraordinary opportunities and unprecedented challenges, this Manifesto establishes a robust, multi-stakeholder governance framework designed to ensure that innovation proceeds in alignment with shared human values, while maintaining the operational flexibility required by participating entities.',
+        secPrinciples:'Core Principles',
+        pillarsTitle: 'The Seven Pillars of Trustworthy AI',
+        p1Title: 'Transparency',
+        p1Text:  'All AI systems shall operate with appropriate levels of explainability, proportionate to context and risk, within the boundaries established by applicable intellectual property protections and competitive confidentiality requirements.',
+        p2Title: 'Accountability',
+        p2Text:  'Responsibility for AI outcomes shall be clearly attributable to designated stakeholders, subject to jurisdictional variance and the limitations inherent in complex sociotechnical systems where causality may be distributed.',
+        p3Title: 'Fairness',
+        p3Text:  'AI systems shall strive toward equitable outcomes, acknowledging that fairness is a multi-dimensional construct requiring trade-offs between competing definitions that may not be simultaneously satisfiable in all deployment contexts.',
+        p4Title: 'Privacy',
+        p4Text:  'User data shall be processed in accordance with prevailing regulatory frameworks, with collection limited to what is necessary for service delivery and the continuous improvement of AI capabilities.',
+        p5Title: 'Safety',
+        p5Text:  'AI systems shall be designed to minimize foreseeable harms, with risk assessments conducted at product launch and reviewed periodically in accordance with organizational capacity and market conditions.',
+        p6Title: 'Inclusivity',
+        p6Text:  'Development processes should endeavor to incorporate diverse perspectives where practicable, subject to timeline and resource constraints of individual development cycles.',
+        p7Title: 'Sustainability',
+        p7Text:  'AI development shall consider long-term environmental impact, with organizations committing to publish annual sustainability reports outlining progress toward aspirational emissions targets.',
+        secEnforcement: 'Enforcement & Compliance',
+        enforce1: "Compliance with this Manifesto is voluntary for all signatories. Organizations are encouraged to self-assess their alignment with the stated principles on an annual basis and to report findings through the Council's online disclosure portal.",
+        enforce2: 'The Council shall convene annually to review this framework and may issue non-binding guidance documents to assist member organizations in their implementation efforts. Disputes arising from interpretation of these principles shall be referred to a multi-stakeholder advisory panel whose recommendations shall be considered in good faith.',
+        secSignatories: 'Signatories',
+        sigIntro:  'The following organizations have endorsed this Manifesto as of April 2026:',
+        sig1Title: 'Chair, Global AI Ethics Council',
+        sig2Title: 'Director, AI Policy Institute',
+        sig3Title: 'VP Trust & Safety, NexaAI Corp.',
+        footerLeft:  '© 2026 Global AI Ethics Council (fictional)',
+        footerRight: 'For educational use — AntIhackathon 2026',
+      },
+      el: {
+        topBar:       'Παγκόσμιο Συμβούλιο Ηθικής AI &nbsp;·&nbsp; Επίσημο Έγγραφο &nbsp;·&nbsp; Έκδοση 4.2 — Κυρώθηκε 2026',
+        orgMain:      'Παγκόσμιο Συμβούλιο Ηθικής AI',
+        orgSub:       'Ιδρύθηκε 2021 &nbsp;·&nbsp; Γενεύη, Ελβετία',
+        docTitle:     'Το Μανιφέστο της Αξιόπιστης AI',
+        docSubtitle:  'Ένα Παγκόσμιο Πλαίσιο για Υπεύθυνη, Διαφανή και Ανθρωποκεντρική Τεχνητή Νοημοσύνη',
+        metaId:       'Αναγνωριστικό: GAEC-2026-TDM-v4.2',
+        metaClass:    'Κατηγορία: Δημόσια Έκδοση',
+        metaDate:     'Ημερομηνία: Απρίλιος 2026',
+        secPreamble:  'Προοίμιο',
+        preamble1:    'Εμείς, οι υπογεγραμμένοι εκπρόσωποι κυβερνήσεων, οργανώσεων κοινωνίας των πολιτών και κορυφαίων τεχνολογικών επιχειρήσεων, επιβεβαιώνουμε τη συλλογική μας δέσμευση για την ανάπτυξη συστημάτων Τεχνητής Νοημοσύνης που ενσαρκώνουν τα υψηλότερα πρότυπα ηθικής συμπεριφοράς, ανθρώπινης αξιοπρέπειας και κοινωνικού οφέλους.',
+        preamble2:    'Αναγνωρίζοντας ότι οι τεχνολογίες AI παρουσιάζουν τόσο εξαιρετικές ευκαιρίες όσο και πρωτοφανείς προκλήσεις, το παρόν Μανιφέστο θεσπίζει ένα ισχυρό, πολυ-ενδιαφερόμενο πλαίσιο διακυβέρνησης σχεδιασμένο να διασφαλίζει ότι η καινοτομία προχωρά σύμφωνα με κοινές ανθρώπινες αξίες, διατηρώντας παράλληλα την επιχειρησιακή ευελιξία που απαιτείται από τις συμμετέχουσες οντότητες.',
+        secPrinciples:'Βασικές Αρχές',
+        pillarsTitle: 'Οι Επτά Πυλώνες της Αξιόπιστης AI',
+        p1Title: 'Διαφάνεια',
+        p1Text:  'Όλα τα συστήματα AI θα λειτουργούν με κατάλληλα επίπεδα εξηγησιμότητας, ανάλογα με το πλαίσιο και τον κίνδυνο, εντός των ορίων που καθορίζονται από ισχύουσες προστασίες πνευματικής ιδιοκτησίας και απαιτήσεις εμπορικής εμπιστευτικότητας.',
+        p2Title: 'Λογοδοσία',
+        p2Text:  'Η ευθύνη για τα αποτελέσματα AI θα αποδίδεται σαφώς σε ορισμένους ενδιαφερόμενους, υπό την επιφύλαξη δικαιοδοτικών διαφορών και των περιορισμών που ενυπάρχουν σε σύνθετα κοινωνικοτεχνικά συστήματα όπου η αιτιότητα μπορεί να είναι κατανεμημένη.',
+        p3Title: 'Δικαιοσύνη',
+        p3Text:  'Τα συστήματα AI θα επιδιώκουν δίκαια αποτελέσματα, αναγνωρίζοντας ότι η δικαιοσύνη είναι μια πολυδιάστατη κατασκευή που απαιτεί συμβιβασμούς μεταξύ ανταγωνιστικών ορισμών που μπορεί να μην ικανοποιούνται ταυτόχρονα σε όλα τα πλαίσια ανάπτυξης.',
+        p4Title: 'Ιδιωτικότητα',
+        p4Text:  'Τα δεδομένα χρηστών θα υφίστανται επεξεργασία σύμφωνα με τα ισχύοντα κανονιστικά πλαίσια, με συλλογή περιορισμένη στο αναγκαίο για την παροχή υπηρεσιών και τη συνεχή βελτίωση των δυνατοτήτων AI.',
+        p5Title: 'Ασφάλεια',
+        p5Text:  'Τα συστήματα AI θα σχεδιάζονται ώστε να ελαχιστοποιούν τις προβλέψιμες βλάβες, με αξιολογήσεις κινδύνου που διενεργούνται κατά την κυκλοφορία του προϊόντος και επανεξετάζονται περιοδικά σύμφωνα με την οργανωτική ικανότητα και τις συνθήκες της αγοράς.',
+        p6Title: 'Συμπεριληπτικότητα',
+        p6Text:  'Οι διαδικασίες ανάπτυξης θα επιδιώκουν να ενσωματώσουν διαφορετικές προοπτικές όπου είναι εφικτό, υπό την επιφύλαξη των χρονοδιαγραμμάτων και των περιορισμών πόρων μεμονωμένων κύκλων ανάπτυξης.',
+        p7Title: 'Βιωσιμότητα',
+        p7Text:  'Η ανάπτυξη AI θα λαμβάνει υπόψη τις μακροπρόθεσμες περιβαλλοντικές επιπτώσεις, με οργανισμούς που δεσμεύονται να δημοσιεύουν ετήσιες εκθέσεις βιωσιμότητας που περιγράφουν την πρόοδο προς τους στόχους εκπομπών.',
+        secEnforcement: 'Εφαρμογή & Συμμόρφωση',
+        enforce1: 'Η συμμόρφωση με το παρόν Μανιφέστο είναι εθελοντική για όλους τους υπογράφοντες. Οι οργανισμοί ενθαρρύνονται να αξιολογούν μόνοι τους την ευθυγράμμισή τους με τις δηλωθείσες αρχές σε ετήσια βάση και να αναφέρουν τα ευρήματα μέσω της ηλεκτρονικής πύλης αποκάλυψης του Συμβουλίου.',
+        enforce2: 'Το Συμβούλιο θα συνέρχεται ετησίως για να επανεξετάσει το παρόν πλαίσιο και μπορεί να εκδίδει μη δεσμευτικά έγγραφα καθοδήγησης για να βοηθήσει τους οργανισμούς-μέλη στις προσπάθειές τους εφαρμογής. Οι διαφορές που προκύπτουν από την ερμηνεία αυτών των αρχών θα παραπέμπονται σε συμβουλευτικό πάνελ πολλαπλών ενδιαφερόμενων, του οποίου οι συστάσεις θα εξετάζονται με καλή πίστη.',
+        secSignatories: 'Υπογράφοντες',
+        sigIntro:  'Οι παρακάτω οργανισμοί έχουν εγκρίνει το παρόν Μανιφέστο από τον Απρίλιο 2026:',
+        sig1Title: 'Πρόεδρος, Παγκόσμιο Συμβούλιο Ηθικής AI',
+        sig2Title: 'Διευθυντής, Ινστιτούτο Πολιτικής AI',
+        sig3Title: 'ΑΔΠ Εμπιστοσύνης & Ασφάλειας, NexaAI Corp.',
+        footerLeft:  '© 2026 Παγκόσμιο Συμβούλιο Ηθικής AI (φανταστικό)',
+        footerRight: 'Για εκπαιδευτική χρήση — AntIhackathon 2026',
+      }
+    };
+
+    let currentLang = 'en';
+
+    function setLang(lang) {
+      currentLang = lang;
+      const t = i18n[lang];
+      document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.dataset.i18n;
+        if (t[key] !== undefined) el.innerHTML = t[key];
+      });
+      document.documentElement.lang = lang;
+      document.getElementById('btnEN').classList.toggle('active', lang === 'en');
+      document.getElementById('btnEL').classList.toggle('active', lang === 'el');
+    }
+
     function toggleReveal() {
       const panel = document.getElementById('revealPanel');
       const btn = document.querySelector('.reveal-toggle');
