@@ -605,7 +605,10 @@
       try {
         const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
         audioChunks = [];
-        mediaRecorder = new MediaRecorder(stream);
+        const mimeType = MediaRecorder.isTypeSupported('audio/ogg;codecs=opus')
+          ? 'audio/ogg;codecs=opus'
+          : 'audio/webm';
+        mediaRecorder = new MediaRecorder(stream, { mimeType });
 
         // Waveform visualizer
         const canvas = document.getElementById('waveform');
@@ -713,7 +716,8 @@
         const formData = new FormData();
         formData.append('name', 'TrustyDevil_Demo_' + Date.now());
         formData.append('description', 'AntIhackathon demo voice clone');
-        formData.append('files', recordedBlob, 'recording.webm');
+        const ext = recordedBlob.type.includes('ogg') ? 'ogg' : 'webm';
+        formData.append('files', recordedBlob, `recording.${ext}`);
 
         const addRes = await fetch('https://api.elevenlabs.io/v1/voices/add', {
           method: 'POST',
@@ -721,7 +725,10 @@
           body: formData
         });
 
-        if (!addRes.ok) throw new Error(`Voice add failed: ${addRes.status}`);
+        if (!addRes.ok) {
+          const errBody = await addRes.text();
+          throw new Error(`Voice add failed: ${addRes.status} — ${errBody}`);
+        }
         const { voice_id } = await addRes.json();
 
         showStatus('<span class="spinner"></span>Σύνθεση ήχου με κλωνοποιημένη φωνή...', '');
