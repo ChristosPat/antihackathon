@@ -842,7 +842,7 @@
           <div class="q-excerpt">${q.excerpt.replace(/\n/g, '<br>')}</div>
           <div class="options">
             ${q.options.map(opt => `
-              <button class="option-btn" onclick="answer(this, ${JSON.stringify(opt)})">
+              <button class="option-btn" onclick='answer(this, ${JSON.stringify(opt)})'>
                 ${opt}
               </button>
             `).join('')}
