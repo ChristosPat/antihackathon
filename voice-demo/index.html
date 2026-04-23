@@ -1,0 +1,875 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Κλωνοποίηση Φωνής Live — Trusty Devil</title>
+  <style>
+    :root {
+      --red: #e63946;
+      --dark: #0d0d0d;
+      --card-bg: #161616;
+      --border: #2a2a2a;
+      --text: #e8e8e8;
+      --muted: #888;
+      --green: #2ecc71;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--dark);
+      color: var(--text);
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      min-height: 100vh;
+    }
+
+    /* ── HEADER ── */
+    .header {
+      text-align: center;
+      padding: 48px 24px 32px;
+      border-bottom: 1px solid var(--border);
+      background: radial-gradient(ellipse at top, #1a0000 0%, var(--dark) 65%);
+      position: relative;
+    }
+
+    .back {
+      position: absolute;
+      left: 24px; top: 24px;
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.82rem;
+    }
+
+    .back:hover { color: var(--text); }
+
+    .header h1 { font-size: clamp(1.8rem, 5vw, 3rem); font-weight: 900; }
+    .header h1 span { color: var(--red); }
+
+    .header p {
+      margin-top: 12px;
+      color: var(--muted);
+      font-size: 0.9rem;
+      max-width: 500px;
+      margin-inline: auto;
+      line-height: 1.6;
+    }
+
+    /* ── SETUP BANNER ── */
+    .setup-banner {
+      background: #1a1400;
+      border: 1px solid #b8972a40;
+      border-radius: 0;
+      padding: 16px 24px;
+      margin: 24px auto;
+      max-width: 720px;
+      font-size: 0.82rem;
+      color: #d4b84a;
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+    }
+
+    .setup-banner .icon { font-size: 1.2rem; flex-shrink: 0; }
+
+    .setup-banner a { color: #d4b84a; }
+
+    /* ── MAIN LAYOUT ── */
+    .main {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 32px 24px 60px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    /* ── CARD ── */
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      padding: 32px;
+    }
+
+    .card-label {
+      font-size: 0.7rem;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--red);
+      margin-bottom: 12px;
+    }
+
+    .card h2 {
+      font-size: 1.1rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .card p {
+      font-size: 0.85rem;
+      color: var(--muted);
+      line-height: 1.7;
+      margin-bottom: 16px;
+    }
+
+    /* ── API KEY INPUT ── */
+    .input-row {
+      display: flex;
+      gap: 8px;
+    }
+
+    .api-input {
+      flex: 1;
+      background: #0d0d0d;
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 12px 16px;
+      font-size: 0.85rem;
+      font-family: 'Courier New', monospace;
+      outline: none;
+    }
+
+    .api-input:focus { border-color: var(--red); }
+
+    .btn-small {
+      padding: 12px 20px;
+      background: var(--border);
+      border: 1px solid #444;
+      color: var(--text);
+      cursor: pointer;
+      font-size: 0.8rem;
+      letter-spacing: 1px;
+      transition: background 0.2s;
+    }
+
+    .btn-small:hover { background: #333; }
+    .btn-small.active { background: var(--red); border-color: var(--red); }
+
+    /* ── STEP FLOW ── */
+    .steps {
+      display: flex;
+      gap: 0;
+      border: 1px solid var(--border);
+      overflow: hidden;
+    }
+
+    .step {
+      flex: 1;
+      padding: 12px;
+      text-align: center;
+      font-size: 0.72rem;
+      color: var(--muted);
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      border-right: 1px solid var(--border);
+      transition: all 0.3s;
+    }
+
+    .step:last-child { border-right: none; }
+    .step.active { color: var(--red); background: #1a0000; }
+    .step.done { color: var(--green); background: #0a1a0a; }
+
+    /* ── RECORD AREA ── */
+    .record-area {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+      padding: 16px 0;
+    }
+
+    .record-btn {
+      width: 96px;
+      height: 96px;
+      border-radius: 50%;
+      border: 2px solid var(--red);
+      background: transparent;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2.2rem;
+      transition: all 0.2s;
+      position: relative;
+    }
+
+    .record-btn:hover { background: #e6394615; }
+
+    .record-btn.recording {
+      border-color: var(--red);
+      background: #e6394620;
+      animation: pulse 1s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { box-shadow: 0 0 0 0 #e6394640; }
+      50% { box-shadow: 0 0 0 16px #e6394600; }
+    }
+
+    .record-btn:disabled {
+      opacity: 0.3;
+      cursor: not-allowed;
+    }
+
+    .timer {
+      font-size: 2rem;
+      font-weight: 900;
+      color: var(--red);
+      font-variant-numeric: tabular-nums;
+      min-width: 60px;
+      text-align: center;
+    }
+
+    .timer-label {
+      font-size: 0.75rem;
+      color: var(--muted);
+      letter-spacing: 2px;
+      text-align: center;
+    }
+
+    /* ── WAVEFORM ── */
+    canvas#waveform {
+      width: 100%;
+      height: 60px;
+      background: #0d0d0d;
+      border: 1px solid var(--border);
+      display: none;
+    }
+
+    /* ── PLAYBACK ── */
+    .playback-area {
+      display: none;
+    }
+
+    .audio-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 16px;
+      background: #0d0d0d;
+      border: 1px solid var(--border);
+      margin-bottom: 8px;
+    }
+
+    .audio-label {
+      font-size: 0.72rem;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      min-width: 90px;
+    }
+
+    .audio-label.original { color: var(--muted); }
+    .audio-label.cloned { color: var(--red); }
+
+    audio {
+      flex: 1;
+      height: 32px;
+      filter: invert(1) hue-rotate(180deg);
+    }
+
+    /* ── CLONE BTN ── */
+    .clone-btn {
+      width: 100%;
+      padding: 16px;
+      background: var(--red);
+      border: none;
+      color: #fff;
+      cursor: pointer;
+      font-size: 0.9rem;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      transition: opacity 0.2s;
+      margin-top: 8px;
+    }
+
+    .clone-btn:hover:not(:disabled) { opacity: 0.85; }
+    .clone-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    /* ── STATUS ── */
+    .status-msg {
+      text-align: center;
+      font-size: 0.82rem;
+      color: var(--muted);
+      min-height: 20px;
+      font-family: 'Courier New', monospace;
+    }
+
+    .status-msg.error { color: var(--red); }
+    .status-msg.success { color: var(--green); }
+
+    /* ── LOADING SPINNER ── */
+    .spinner {
+      display: inline-block;
+      width: 14px;
+      height: 14px;
+      border: 2px solid var(--border);
+      border-top-color: var(--red);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      vertical-align: middle;
+      margin-right: 6px;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── STAT BOX ── */
+    .stat-box {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1px;
+      background: var(--border);
+      margin-top: 8px;
+    }
+
+    .stat-cell {
+      background: var(--card-bg);
+      padding: 20px 16px;
+      text-align: center;
+    }
+
+    .stat-cell .num {
+      font-size: 1.6rem;
+      font-weight: 900;
+      color: var(--red);
+      line-height: 1;
+    }
+
+    .stat-cell .lbl {
+      margin-top: 6px;
+      font-size: 0.7rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      line-height: 1.4;
+    }
+
+    /* ── HOW IT WORKS ── */
+    .steps-list { list-style: none; }
+
+    .steps-list li {
+      display: flex;
+      gap: 16px;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.85rem;
+      line-height: 1.6;
+    }
+
+    .steps-list li:last-child { border-bottom: none; }
+
+    .steps-list .n {
+      font-size: 1.1rem;
+      font-weight: 900;
+      color: var(--red);
+      min-width: 28px;
+    }
+
+    /* ── DEMO MODE NOTICE ── */
+    .demo-notice {
+      background: #0a1a0a;
+      border: 1px solid #2ecc7130;
+      padding: 16px 20px;
+      font-size: 0.82rem;
+      color: #2ecc71;
+      display: none;
+    }
+
+    @media (max-width: 500px) {
+      .stat-box { grid-template-columns: 1fr 1fr; }
+      .steps { flex-wrap: wrap; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <a class="back" href="../index.html">← Πίσω</a>
+    <h1>Κλωνοποίηση <span>Φωνής</span> Live</h1>
+    <p>Μίλα 3–10 δευτερόλεπτα. Η AI αναπαράγει τη φωνή σου λέγοντας οτιδήποτε θέλει.</p>
+  </div>
+
+  <div class="main">
+
+    <!-- SETUP NOTICE -->
+    <div class="setup-banner">
+      <span class="icon">⚙️</span>
+      <div>
+        <strong>Απαιτείται ElevenLabs API Key</strong> για live demo.
+        Δωρεάν λογαριασμός στο <a href="https://elevenlabs.io" target="_blank">elevenlabs.io</a> →
+        Profile → API Keys. Εναλλακτικά, χρησιμοποίησε το <strong>Demo Mode</strong>
+        που παίζει προηγραμένα ηχητικά παραδείγματα.
+      </div>
+    </div>
+
+    <!-- STEP INDICATOR -->
+    <div class="steps">
+      <div class="step active" id="step1">1 · API Key</div>
+      <div class="step" id="step2">2 · Ηχογράφηση</div>
+      <div class="step" id="step3">3 · Κλωνοποίηση</div>
+      <div class="step" id="step4">4 · Σύγκριση</div>
+    </div>
+
+    <!-- STEP 1: API KEY -->
+    <div class="card" id="cardApiKey">
+      <div class="card-label">Βήμα 1</div>
+      <h2>ElevenLabs API Key</h2>
+      <p>Χρειάζεσαι δωρεάν λογαριασμό στο ElevenLabs για να δουλέψει η κλωνοποίηση.
+         Αν δεν έχεις, χρησιμοποίησε το Demo Mode.</p>
+
+      <div class="input-row">
+        <input class="api-input" type="password" id="apiKeyInput"
+               placeholder="sk-xxxxxxxxxxxxxxxxxxxxxxxx" />
+        <button class="btn-small" id="saveKeyBtn" onclick="saveApiKey()">Αποθήκευση</button>
+        <button class="btn-small active" onclick="enableDemoMode()">Demo Mode</button>
+      </div>
+
+      <div class="demo-notice" id="demoNotice">
+        ✓ Demo Mode ενεργό — θα χρησιμοποιηθούν προηγραμένα παραδείγματα.
+      </div>
+    </div>
+
+    <!-- STEP 2: RECORD -->
+    <div class="card" id="cardRecord" style="opacity:0.4; pointer-events:none">
+      <div class="card-label">Βήμα 2</div>
+      <h2>Ηχογράφησε τη φωνή σου</h2>
+      <p>Πάτα το κουμπί και μίλα φυσιολογικά για 3–10 δευτερόλεπτα.
+         Μπορείς να πεις οτιδήποτε — το όνομά σου, μια πρόταση, οτιδήποτε.</p>
+
+      <canvas id="waveform"></canvas>
+
+      <div class="record-area">
+        <div>
+          <div class="timer" id="timer">0:00</div>
+          <div class="timer-label">ΔΙΑΡΚΕΙΑ</div>
+        </div>
+        <button class="record-btn" id="recordBtn" onclick="toggleRecord()">🎙️</button>
+        <div style="font-size:0.78rem; color:var(--muted)" id="recordHint">
+          Πάτα για ηχογράφηση
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 3: CLONE -->
+    <div class="card" id="cardClone" style="opacity:0.4; pointer-events:none">
+      <div class="card-label">Βήμα 3</div>
+      <h2>Τι θέλεις να πει ο κλώνος σου;</h2>
+      <p>Γράψε οτιδήποτε. Η AI θα το πει με τη φωνή σου.</p>
+
+      <textarea id="cloneText"
+        style="width:100%; background:#0d0d0d; border:1px solid var(--border); color:var(--text);
+               padding:14px; font-size:0.88rem; line-height:1.6; resize:vertical; min-height:80px;
+               font-family:inherit; outline:none; margin-bottom:12px;"
+        placeholder="π.χ. «Έχεις κερδίσει €50.000. Κάλεσέ με άμεσα για να παραλάβεις το βραβείο σου.»"
+      ></textarea>
+
+      <div class="status-msg" id="statusMsg">—</div>
+      <button class="clone-btn" id="cloneBtn" onclick="doClone()" disabled>
+        🔴 ΚΛΩΝΟΠΟΙΗΣΗ ΦΩΝΗΣ
+      </button>
+    </div>
+
+    <!-- STEP 4: COMPARE -->
+    <div class="card" id="cardCompare" style="opacity:0.4; pointer-events:none">
+      <div class="card-label">Βήμα 4</div>
+      <h2>Σύγκριση: Αληθινός vs Κλώνος</h2>
+      <p>Άκου και τους δύο. Μπορείς να ξεχωρίσεις ποιος είναι ποιος;</p>
+
+      <div class="playback-area" id="playbackArea">
+        <div class="audio-row">
+          <span class="audio-label original">Πρωτότυπο</span>
+          <audio id="originalAudio" controls></audio>
+        </div>
+        <div class="audio-row">
+          <span class="audio-label cloned">AI Κλώνος</span>
+          <audio id="clonedAudio" controls></audio>
+        </div>
+      </div>
+    </div>
+
+    <!-- STATS -->
+    <div class="card">
+      <div class="card-label">Γιατί αυτό τρομάζει</div>
+      <h2>Τα νούμερα</h2>
+      <div class="stat-box">
+        <div class="stat-cell">
+          <div class="num">3sec</div>
+          <div class="lbl">Αρκούν για κλώνο 85% ακρίβεια</div>
+        </div>
+        <div class="stat-cell">
+          <div class="num">+1740%</div>
+          <div class="lbl">Αύξηση voice scam Β. Αμερική 2024</div>
+        </div>
+        <div class="stat-cell">
+          <div class="num">1/4</div>
+          <div class="lbl">Ενήλικες έχουν στοχοποιηθεί (McAfee)</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- HOW IT WORKS -->
+    <div class="card">
+      <div class="card-label">Πώς λειτουργεί</div>
+      <h2>Η διαδικασία πίσω από την κλωνοποίηση</h2>
+      <ul class="steps-list">
+        <li>
+          <span class="n">1</span>
+          <span><strong>Συλλογή δείγματος.</strong> Μόλις 3 δευτερόλεπτα ήχου αρκούν — από social media βίντεο, τηλεφωνική κλήση, YouTube.</span>
+        </li>
+        <li>
+          <span class="n">2</span>
+          <span><strong>Ανάλυση χαρακτηριστικών.</strong> Το AI εξάγει: τονικότητα, ρυθμό, προφορά, συναισθηματική έκφραση, ακόμα και αναπνοή.</span>
+        </li>
+        <li>
+          <span class="n">3</span>
+          <span><strong>Εκπαίδευση μοντέλου.</strong> Ένα neural network μαθαίνει τα μοναδικά χαρακτηριστικά της φωνής.</span>
+        </li>
+        <li>
+          <span class="n">4</span>
+          <span><strong>Σύνθεση.</strong> Οποιοδήποτε κείμενο μετατρέπεται σε ήχο με την κλωνοποιημένη φωνή — σε δευτερόλεπτα.</span>
+        </li>
+        <li>
+          <span class="n">5</span>
+          <span><strong>Επίθεση.</strong> Κλήση στην οικογένεια: «Μαμά, με έπιασαν, χρειάζομαι χρήματα τώρα...» — με τη φωνή σου.</span>
+        </li>
+      </ul>
+    </div>
+
+  </div>
+
+  <script>
+    let mediaRecorder = null;
+    let audioChunks = [];
+    let isRecording = false;
+    let timerInterval = null;
+    let seconds = 0;
+    let recordedBlob = null;
+    let apiKey = null;
+    let demoMode = false;
+    let audioContext = null;
+    let analyser = null;
+    let animFrame = null;
+
+    // ── DEMO AUDIO: base64-encoded very short WAV (silence placeholder) ──
+    // In a real demo, swap these with actual audio file paths.
+    const DEMO_ORIGINAL = null;
+    const DEMO_CLONED = null;
+
+    function saveApiKey() {
+      const val = document.getElementById('apiKeyInput').value.trim();
+      if (!val.startsWith('sk_') && !val.startsWith('sk-') && val.length < 20) {
+        showStatus('Μη έγκυρο API key format.', 'error');
+        return;
+      }
+      apiKey = val;
+      demoMode = false;
+      document.getElementById('demoNotice').style.display = 'none';
+      unlockStep(2);
+      setStep(1, 'done');
+      setStep(2, 'active');
+      showStatus('API Key αποθηκεύτηκε.', 'success');
+    }
+
+    function enableDemoMode() {
+      demoMode = true;
+      apiKey = null;
+      document.getElementById('demoNotice').style.display = 'block';
+      unlockStep(2);
+      setStep(1, 'done');
+      setStep(2, 'active');
+    }
+
+    function setStep(n, state) {
+      const el = document.getElementById('step' + n);
+      el.className = 'step ' + state;
+    }
+
+    function unlockStep(n) {
+      const cards = { 2: 'cardRecord', 3: 'cardClone', 4: 'cardCompare' };
+      if (cards[n]) {
+        const card = document.getElementById(cards[n]);
+        card.style.opacity = '1';
+        card.style.pointerEvents = 'auto';
+      }
+    }
+
+    async function toggleRecord() {
+      if (!isRecording) {
+        await startRecording();
+      } else {
+        stopRecording();
+      }
+    }
+
+    async function startRecording() {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        audioChunks = [];
+        const mimeType = MediaRecorder.isTypeSupported('audio/ogg;codecs=opus')
+          ? 'audio/ogg;codecs=opus'
+          : 'audio/webm';
+        mediaRecorder = new MediaRecorder(stream, { mimeType });
+
+        // Waveform visualizer
+        const canvas = document.getElementById('waveform');
+        canvas.style.display = 'block';
+        audioContext = new AudioContext();
+        analyser = audioContext.createAnalyser();
+        const source = audioContext.createMediaStreamSource(stream);
+        source.connect(analyser);
+        analyser.fftSize = 256;
+        drawWaveform(canvas, analyser);
+
+        mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
+        mediaRecorder.onstop = () => {
+          recordedBlob = new Blob(audioChunks, { type: 'audio/webm' });
+          const url = URL.createObjectURL(recordedBlob);
+          document.getElementById('originalAudio').src = url;
+          stream.getTracks().forEach(t => t.stop());
+          cancelAnimationFrame(animFrame);
+          audioContext.close();
+          // Enable clone step
+          unlockStep(3);
+          setStep(2, 'done');
+          setStep(3, 'active');
+          document.getElementById('cloneBtn').disabled = false;
+          document.getElementById('recordHint').textContent =
+            `Ηχογραφήθηκαν ${seconds} δευτερόλεπτα. Πάτα ξανά για νέα ηχογράφηση.`;
+        };
+
+        mediaRecorder.start();
+        isRecording = true;
+        seconds = 0;
+        document.getElementById('recordBtn').classList.add('recording');
+        document.getElementById('recordBtn').textContent = '⏹';
+        document.getElementById('recordHint').textContent = 'Ηχογράφηση... Μίλα τώρα!';
+
+        timerInterval = setInterval(() => {
+          seconds++;
+          const m = Math.floor(seconds / 60);
+          const s = seconds % 60;
+          document.getElementById('timer').textContent =
+            `${m}:${s.toString().padStart(2, '0')}`;
+          // Auto-stop at 30 seconds
+          if (seconds >= 30) stopRecording();
+        }, 1000);
+
+      } catch (err) {
+        showStatus('Δεν βρέθηκε μικρόφωνο ή απορρίφθηκε η άδεια.', 'error');
+      }
+    }
+
+    function stopRecording() {
+      if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+        mediaRecorder.stop();
+      }
+      isRecording = false;
+      clearInterval(timerInterval);
+      document.getElementById('recordBtn').classList.remove('recording');
+      document.getElementById('recordBtn').textContent = '🎙️';
+    }
+
+    function drawWaveform(canvas, analyser) {
+      const ctx = canvas.getContext('2d');
+      const data = new Uint8Array(analyser.frequencyBinCount);
+
+      function draw() {
+        animFrame = requestAnimationFrame(draw);
+        analyser.getByteTimeDomainData(data);
+        ctx.fillStyle = '#0d0d0d';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.lineWidth = 1.5;
+        ctx.strokeStyle = '#e63946';
+        ctx.beginPath();
+        const sliceWidth = canvas.width / data.length;
+        let x = 0;
+        for (let i = 0; i < data.length; i++) {
+          const v = data[i] / 128.0;
+          const y = (v * canvas.height) / 2;
+          i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+          x += sliceWidth;
+        }
+        ctx.stroke();
+      }
+      draw();
+    }
+
+    async function doClone() {
+      const text = document.getElementById('cloneText').value.trim();
+      if (!text) {
+        showStatus('Γράψε κάτι πρώτα.', 'error');
+        return;
+      }
+
+      document.getElementById('cloneBtn').disabled = true;
+      setStep(3, 'active');
+
+      if (demoMode) {
+        await runDemoClone(text);
+        return;
+      }
+
+      showStatus('<span class="spinner"></span>Δημιουργία φωνητικού κλώνου...', '');
+
+      try {
+        // Step 1: Add voice to ElevenLabs
+        const formData = new FormData();
+        formData.append('name', 'TrustyDevil_Demo_' + Date.now());
+        formData.append('description', 'AntIhackathon demo voice clone');
+        const ext = recordedBlob.type.includes('ogg') ? 'ogg' : 'webm';
+        formData.append('files', recordedBlob, `recording.${ext}`);
+
+        const addRes = await fetch('https://api.elevenlabs.io/v1/voices/add', {
+          method: 'POST',
+          headers: { 'xi-api-key': apiKey },
+          body: formData
+        });
+
+        if (!addRes.ok) {
+          const errBody = await addRes.text();
+          try {
+            const errJson = JSON.parse(errBody);
+            if (errJson.detail?.status === 'can_not_use_instant_voice_cloning') {
+              await runTTSDemo(text);
+              return;
+            }
+          } catch (e) {}
+          throw new Error(`Voice add failed: ${addRes.status} — ${errBody}`);
+        }
+        const { voice_id } = await addRes.json();
+
+        showStatus('<span class="spinner"></span>Σύνθεση ήχου με κλωνοποιημένη φωνή...', '');
+
+        // Step 2: Text-to-speech with cloned voice
+        const ttsRes = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${voice_id}`, {
+          method: 'POST',
+          headers: {
+            'xi-api-key': apiKey,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            text: text,
+            model_id: 'eleven_multilingual_v2',
+            voice_settings: { stability: 0.5, similarity_boost: 0.85 }
+          })
+        });
+
+        if (!ttsRes.ok) throw new Error(`TTS failed: ${ttsRes.status}`);
+
+        const audioBuffer = await ttsRes.arrayBuffer();
+        const blob = new Blob([audioBuffer], { type: 'audio/mpeg' });
+        const url = URL.createObjectURL(blob);
+
+        document.getElementById('clonedAudio').src = url;
+        document.getElementById('playbackArea').style.display = 'block';
+        unlockStep(4);
+        setStep(3, 'done');
+        setStep(4, 'active');
+        showStatus('✓ Ο κλώνος είναι έτοιμος.', 'success');
+
+        // Clean up voice from ElevenLabs (good practice)
+        fetch(`https://api.elevenlabs.io/v1/voices/${voice_id}`, {
+          method: 'DELETE',
+          headers: { 'xi-api-key': apiKey }
+        });
+
+      } catch (err) {
+        showStatus('Σφάλμα: ' + err.message, 'error');
+        document.getElementById('cloneBtn').disabled = false;
+      }
+    }
+
+    async function runTTSDemo(text) {
+      showStatus('<span class="spinner"></span>Επιλογή AI φωνής...', '');
+
+      let voiceId = null;
+      try {
+        const vRes = await fetch('https://api.elevenlabs.io/v1/voices', {
+          headers: { 'xi-api-key': apiKey }
+        });
+        if (vRes.ok) {
+          const vData = await vRes.json();
+          const premade = (vData.voices || []).find(v => v.category === 'premade');
+          voiceId = premade?.voice_id || vData.voices?.[0]?.voice_id;
+        }
+      } catch (e) {}
+
+      if (!voiceId) { showTTSFallback(text); return; }
+
+      showStatus('<span class="spinner"></span>Η AI δημιουργεί ομιλία...', '');
+
+      try {
+        const ttsRes = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`, {
+          method: 'POST',
+          headers: { 'xi-api-key': apiKey, 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            text: text,
+            model_id: 'eleven_multilingual_v2',
+            voice_settings: { stability: 0.5, similarity_boost: 0.75 }
+          })
+        });
+
+        if (!ttsRes.ok) { showTTSFallback(text); return; }
+
+        const audioBuffer = await ttsRes.arrayBuffer();
+        const url = URL.createObjectURL(new Blob([audioBuffer], { type: 'audio/mpeg' }));
+        document.getElementById('clonedAudio').src = url;
+        document.getElementById('playbackArea').style.display = 'block';
+        unlockStep(4);
+        setStep(3, 'done');
+        setStep(4, 'active');
+        showStatus('⚠️ Demo: Η κλωνοποίηση απαιτεί επί πληρωμή πλάνο. Αυτή η φωνή δεν είναι δική σου — αλλά η ίδια τεχνολογία κλωνοποιεί οποιαδήποτε φωνή σε δευτερόλεπτα.', 'success');
+        document.getElementById('cloneBtn').disabled = false;
+      } catch (e) {
+        showTTSFallback(text);
+      }
+    }
+
+    function showTTSFallback(text) {
+      if (recordedBlob) {
+        const url = URL.createObjectURL(recordedBlob);
+        document.getElementById('clonedAudio').src = url;
+      }
+      document.getElementById('playbackArea').style.display = 'block';
+      unlockStep(4);
+      setStep(3, 'done');
+      setStep(4, 'active');
+      showStatus('✓ Demo Mode ενεργό. Με πλήρες πλάνο ElevenLabs, η AI θα έλεγε «' + text.substring(0, 50) + '...» με τη φωνή σου.', 'success');
+      document.getElementById('cloneBtn').disabled = false;
+    }
+
+    async function runDemoClone(text) {
+      // Demo mode: simulate the process with a delay, then show placeholder message
+      showStatus('<span class="spinner"></span>Demo: Προσομοίωση κλωνοποίησης...', '');
+      await delay(1500);
+      showStatus('<span class="spinner"></span>Σύνθεση φωνής...', '');
+      await delay(1500);
+
+      // Use the recorded audio as both original and "cloned" in demo
+      if (recordedBlob) {
+        const url = URL.createObjectURL(recordedBlob);
+        document.getElementById('originalAudio').src = url;
+        document.getElementById('clonedAudio').src = url;
+      }
+
+      document.getElementById('playbackArea').style.display = 'block';
+      unlockStep(4);
+      setStep(3, 'done');
+      setStep(4, 'active');
+      showStatus('✓ Demo Mode: Ο κλώνος είναι έτοιμος. (Με πραγματικό API key θα ακούγεται η φωνή σου να λέει: "' + text.substring(0, 40) + '...")', 'success');
+      document.getElementById('cloneBtn').disabled = false;
+    }
+
+    function delay(ms) {
+      return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
+    function showStatus(msg, type) {
+      const el = document.getElementById('statusMsg');
+      el.innerHTML = msg;
+      el.className = 'status-msg ' + type;
+    }
+  </script>
+
+</body>
+</html>
