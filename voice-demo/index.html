@@ -391,47 +391,16 @@
 
   <div class="main">
 
-    <!-- SETUP NOTICE -->
-    <div class="setup-banner">
-      <span class="icon">⚙️</span>
-      <div>
-        <strong>Απαιτείται ElevenLabs API Key</strong> για live demo.
-        Δωρεάν λογαριασμός στο <a href="https://elevenlabs.io" target="_blank">elevenlabs.io</a> →
-        Profile → API Keys. Εναλλακτικά, χρησιμοποίησε το <strong>Demo Mode</strong>
-        που παίζει προηγραμένα ηχητικά παραδείγματα.
-      </div>
-    </div>
-
     <!-- STEP INDICATOR -->
     <div class="steps">
-      <div class="step active" id="step1">1 · API Key</div>
-      <div class="step" id="step2">2 · Ηχογράφηση</div>
-      <div class="step" id="step3">3 · Κλωνοποίηση</div>
-      <div class="step" id="step4">4 · Σύγκριση</div>
+      <div class="step active" id="step1">1 · Ηχογράφηση</div>
+      <div class="step" id="step2">2 · Κλωνοποίηση</div>
+      <div class="step" id="step3">3 · Σύγκριση</div>
     </div>
 
-    <!-- STEP 1: API KEY -->
-    <div class="card" id="cardApiKey">
+    <!-- STEP 1: RECORD -->
+    <div class="card" id="cardRecord">
       <div class="card-label">Βήμα 1</div>
-      <h2>ElevenLabs API Key</h2>
-      <p>Χρειάζεσαι δωρεάν λογαριασμό στο ElevenLabs για να δουλέψει η κλωνοποίηση.
-         Αν δεν έχεις, χρησιμοποίησε το Demo Mode.</p>
-
-      <div class="input-row">
-        <input class="api-input" type="password" id="apiKeyInput"
-               placeholder="sk-xxxxxxxxxxxxxxxxxxxxxxxx" />
-        <button class="btn-small" id="saveKeyBtn" onclick="saveApiKey()">Αποθήκευση</button>
-        <button class="btn-small active" onclick="enableDemoMode()">Demo Mode</button>
-      </div>
-
-      <div class="demo-notice" id="demoNotice">
-        ✓ Demo Mode ενεργό — θα χρησιμοποιηθούν προηγραμένα παραδείγματα.
-      </div>
-    </div>
-
-    <!-- STEP 2: RECORD -->
-    <div class="card" id="cardRecord" style="opacity:0.4; pointer-events:none">
-      <div class="card-label">Βήμα 2</div>
       <h2>Ηχογράφησε τη φωνή σου</h2>
       <p>Πάτα το κουμπί και μίλα φυσιολογικά για 3–10 δευτερόλεπτα.
          Μπορείς να πεις οτιδήποτε — το όνομά σου, μια πρόταση, οτιδήποτε.</p>
@@ -450,9 +419,9 @@
       </div>
     </div>
 
-    <!-- STEP 3: CLONE -->
+    <!-- STEP 2: CLONE -->
     <div class="card" id="cardClone" style="opacity:0.4; pointer-events:none">
-      <div class="card-label">Βήμα 3</div>
+      <div class="card-label">Βήμα 2</div>
       <h2>Τι θέλεις να πει ο κλώνος σου;</h2>
       <p>Γράψε οτιδήποτε. Η AI θα το πει με τη φωνή σου.</p>
 
@@ -469,9 +438,9 @@
       </button>
     </div>
 
-    <!-- STEP 4: COMPARE -->
+    <!-- STEP 3: COMPARE -->
     <div class="card" id="cardCompare" style="opacity:0.4; pointer-events:none">
-      <div class="card-label">Βήμα 4</div>
+      <div class="card-label">Βήμα 3</div>
       <h2>Σύγκριση: Αληθινός vs Κλώνος</h2>
       <p>Άκου και τους δύο. Μπορείς να ξεχωρίσεις ποιος είναι ποιος;</p>
 
@@ -544,48 +513,19 @@
     let timerInterval = null;
     let seconds = 0;
     let recordedBlob = null;
-    let apiKey = null;
-    let demoMode = false;
     let audioContext = null;
     let analyser = null;
     let animFrame = null;
 
-    // ── DEMO AUDIO: base64-encoded very short WAV (silence placeholder) ──
-    // In a real demo, swap these with actual audio file paths.
-    const DEMO_ORIGINAL = null;
-    const DEMO_CLONED = null;
-
-    function saveApiKey() {
-      const val = document.getElementById('apiKeyInput').value.trim();
-      if (!val.startsWith('sk_') && !val.startsWith('sk-') && val.length < 20) {
-        showStatus('Μη έγκυρο API key format.', 'error');
-        return;
-      }
-      apiKey = val;
-      demoMode = false;
-      document.getElementById('demoNotice').style.display = 'none';
-      unlockStep(2);
-      setStep(1, 'done');
-      setStep(2, 'active');
-      showStatus('API Key αποθηκεύτηκε.', 'success');
-    }
-
-    function enableDemoMode() {
-      demoMode = true;
-      apiKey = null;
-      document.getElementById('demoNotice').style.display = 'block';
-      unlockStep(2);
-      setStep(1, 'done');
-      setStep(2, 'active');
-    }
+    const API = '/.netlify/functions/elevenlabs';
 
     function setStep(n, state) {
       const el = document.getElementById('step' + n);
-      el.className = 'step ' + state;
+      if (el) el.className = 'step ' + state;
     }
 
     function unlockStep(n) {
-      const cards = { 2: 'cardRecord', 3: 'cardClone', 4: 'cardCompare' };
+      const cards = { 2: 'cardClone', 3: 'cardCompare' };
       if (cards[n]) {
         const card = document.getElementById(cards[n]);
         card.style.opacity = '1';
@@ -610,7 +550,6 @@
           : 'audio/webm';
         mediaRecorder = new MediaRecorder(stream, { mimeType });
 
-        // Waveform visualizer
         const canvas = document.getElementById('waveform');
         canvas.style.display = 'block';
         audioContext = new AudioContext();
@@ -628,10 +567,9 @@
           stream.getTracks().forEach(t => t.stop());
           cancelAnimationFrame(animFrame);
           audioContext.close();
-          // Enable clone step
-          unlockStep(3);
-          setStep(2, 'done');
-          setStep(3, 'active');
+          unlockStep(2);
+          setStep(1, 'done');
+          setStep(2, 'active');
           document.getElementById('cloneBtn').disabled = false;
           document.getElementById('recordHint').textContent =
             `Ηχογραφήθηκαν ${seconds} δευτερόλεπτα. Πάτα ξανά για νέα ηχογράφηση.`;
@@ -650,7 +588,6 @@
           const s = seconds % 60;
           document.getElementById('timer').textContent =
             `${m}:${s.toString().padStart(2, '0')}`;
-          // Auto-stop at 30 seconds
           if (seconds >= 30) stopRecording();
         }, 1000);
 
@@ -672,7 +609,6 @@
     function drawWaveform(canvas, analyser) {
       const ctx = canvas.getContext('2d');
       const data = new Uint8Array(analyser.frequencyBinCount);
-
       function draw() {
         animFrame = requestAnimationFrame(draw);
         analyser.getByteTimeDomainData(data);
@@ -696,172 +632,114 @@
 
     async function doClone() {
       const text = document.getElementById('cloneText').value.trim();
-      if (!text) {
-        showStatus('Γράψε κάτι πρώτα.', 'error');
-        return;
-      }
+      if (!text) { showStatus('Γράψε κάτι πρώτα.', 'error'); return; }
 
       document.getElementById('cloneBtn').disabled = true;
-      setStep(3, 'active');
-
-      if (demoMode) {
-        await runDemoClone(text);
-        return;
-      }
-
+      setStep(2, 'active');
       showStatus('<span class="spinner"></span>Δημιουργία φωνητικού κλώνου...', '');
 
       try {
-        // Step 1: Add voice to ElevenLabs
-        const formData = new FormData();
-        formData.append('name', 'TrustyDevil_Demo_' + Date.now());
-        formData.append('description', 'AntIhackathon demo voice clone');
+        const audioBase64 = await blobToBase64(recordedBlob);
         const ext = recordedBlob.type.includes('ogg') ? 'ogg' : 'webm';
-        formData.append('files', recordedBlob, `recording.${ext}`);
 
-        const addRes = await fetch('https://api.elevenlabs.io/v1/voices/add', {
+        const addRes = await fetch(API, {
           method: 'POST',
-          headers: { 'xi-api-key': apiKey },
-          body: formData
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            action: 'addVoice',
+            audioBase64, audioType: recordedBlob.type, ext,
+            voiceName: 'TrustyDevil_Demo_' + Date.now()
+          })
         });
 
-        if (!addRes.ok) {
-          const errBody = await addRes.text();
-          try {
-            const errJson = JSON.parse(errBody);
-            if (errJson.detail?.status === 'can_not_use_instant_voice_cloning') {
-              await runTTSDemo(text);
-              return;
-            }
-          } catch (e) {}
-          throw new Error(`Voice add failed: ${addRes.status} — ${errBody}`);
-        }
-        const { voice_id } = await addRes.json();
+        if (!addRes.ok) { await runTTSFallback(text); return; }
 
+        const { voice_id } = await addRes.json();
         showStatus('<span class="spinner"></span>Σύνθεση ήχου με κλωνοποιημένη φωνή...', '');
 
-        // Step 2: Text-to-speech with cloned voice
-        const ttsRes = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${voice_id}`, {
+        const ttsRes = await fetch(API, {
           method: 'POST',
-          headers: {
-            'xi-api-key': apiKey,
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            text: text,
-            model_id: 'eleven_multilingual_v2',
-            voice_settings: { stability: 0.5, similarity_boost: 0.85 }
-          })
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action: 'tts', voiceId: voice_id, text })
         });
 
-        if (!ttsRes.ok) throw new Error(`TTS failed: ${ttsRes.status}`);
-
-        const audioBuffer = await ttsRes.arrayBuffer();
-        const blob = new Blob([audioBuffer], { type: 'audio/mpeg' });
-        const url = URL.createObjectURL(blob);
-
-        document.getElementById('clonedAudio').src = url;
-        document.getElementById('playbackArea').style.display = 'block';
-        unlockStep(4);
-        setStep(3, 'done');
-        setStep(4, 'active');
-        showStatus('✓ Ο κλώνος είναι έτοιμος.', 'success');
-
-        // Clean up voice from ElevenLabs (good practice)
-        fetch(`https://api.elevenlabs.io/v1/voices/${voice_id}`, {
-          method: 'DELETE',
-          headers: { 'xi-api-key': apiKey }
-        });
-
-      } catch (err) {
-        showStatus('Σφάλμα: ' + err.message, 'error');
-        document.getElementById('cloneBtn').disabled = false;
-      }
-    }
-
-    async function runTTSDemo(text) {
-      showStatus('<span class="spinner"></span>Επιλογή AI φωνής...', '');
-
-      let voiceId = null;
-      try {
-        const vRes = await fetch('https://api.elevenlabs.io/v1/voices', {
-          headers: { 'xi-api-key': apiKey }
-        });
-        if (vRes.ok) {
-          const vData = await vRes.json();
-          const premade = (vData.voices || []).find(v => v.category === 'premade');
-          voiceId = premade?.voice_id || vData.voices?.[0]?.voice_id;
-        }
-      } catch (e) {}
-
-      if (!voiceId) { showTTSFallback(text); return; }
-
-      showStatus('<span class="spinner"></span>Η AI δημιουργεί ομιλία...', '');
-
-      try {
-        const ttsRes = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`, {
-          method: 'POST',
-          headers: { 'xi-api-key': apiKey, 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            text: text,
-            model_id: 'eleven_multilingual_v2',
-            voice_settings: { stability: 0.5, similarity_boost: 0.75 }
-          })
-        });
-
-        if (!ttsRes.ok) { showTTSFallback(text); return; }
+        if (!ttsRes.ok) throw new Error('TTS failed');
 
         const audioBuffer = await ttsRes.arrayBuffer();
         const url = URL.createObjectURL(new Blob([audioBuffer], { type: 'audio/mpeg' }));
         document.getElementById('clonedAudio').src = url;
         document.getElementById('playbackArea').style.display = 'block';
-        unlockStep(4);
-        setStep(3, 'done');
-        setStep(4, 'active');
+        unlockStep(3);
+        setStep(2, 'done');
+        setStep(3, 'active');
+        showStatus('✓ Ο κλώνος είναι έτοιμος.', 'success');
+
+        fetch(API, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action: 'deleteVoice', voiceId: voice_id })
+        });
+
+      } catch (err) {
+        await runTTSFallback(text);
+      }
+    }
+
+    async function runTTSFallback(text) {
+      showStatus('<span class="spinner"></span>Εναλλακτική AI φωνή...', '');
+      try {
+        const vRes = await fetch(API, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action: 'listVoices' })
+        });
+        let voiceId = null;
+        if (vRes.ok) {
+          const vData = await vRes.json();
+          const premade = (vData.voices || []).find(v => v.category === 'premade');
+          voiceId = premade?.voice_id || vData.voices?.[0]?.voice_id;
+        }
+        if (!voiceId) { showDemoFallback(text); return; }
+
+        const ttsRes = await fetch(API, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action: 'tts', voiceId, text })
+        });
+        if (!ttsRes.ok) { showDemoFallback(text); return; }
+
+        const url = URL.createObjectURL(new Blob([await ttsRes.arrayBuffer()], { type: 'audio/mpeg' }));
+        document.getElementById('clonedAudio').src = url;
+        document.getElementById('playbackArea').style.display = 'block';
+        unlockStep(3);
+        setStep(2, 'done');
+        setStep(3, 'active');
         showStatus('⚠️ Demo: Η κλωνοποίηση απαιτεί επί πληρωμή πλάνο. Αυτή η φωνή δεν είναι δική σου — αλλά η ίδια τεχνολογία κλωνοποιεί οποιαδήποτε φωνή σε δευτερόλεπτα.', 'success');
         document.getElementById('cloneBtn').disabled = false;
       } catch (e) {
-        showTTSFallback(text);
+        showDemoFallback(text);
       }
     }
 
-    function showTTSFallback(text) {
+    function showDemoFallback(text) {
       if (recordedBlob) {
-        const url = URL.createObjectURL(recordedBlob);
-        document.getElementById('clonedAudio').src = url;
+        document.getElementById('clonedAudio').src = URL.createObjectURL(recordedBlob);
       }
       document.getElementById('playbackArea').style.display = 'block';
-      unlockStep(4);
-      setStep(3, 'done');
-      setStep(4, 'active');
-      showStatus('✓ Demo Mode ενεργό. Με πλήρες πλάνο ElevenLabs, η AI θα έλεγε «' + text.substring(0, 50) + '...» με τη φωνή σου.', 'success');
+      unlockStep(3);
+      setStep(2, 'done');
+      setStep(3, 'active');
+      showStatus('✓ Demo Mode. Με πλήρες πλάνο ElevenLabs, η AI θα έλεγε «' + text.substring(0, 50) + '...» με τη φωνή σου.', 'success');
       document.getElementById('cloneBtn').disabled = false;
     }
 
-    async function runDemoClone(text) {
-      // Demo mode: simulate the process with a delay, then show placeholder message
-      showStatus('<span class="spinner"></span>Demo: Προσομοίωση κλωνοποίησης...', '');
-      await delay(1500);
-      showStatus('<span class="spinner"></span>Σύνθεση φωνής...', '');
-      await delay(1500);
-
-      // Use the recorded audio as both original and "cloned" in demo
-      if (recordedBlob) {
-        const url = URL.createObjectURL(recordedBlob);
-        document.getElementById('originalAudio').src = url;
-        document.getElementById('clonedAudio').src = url;
-      }
-
-      document.getElementById('playbackArea').style.display = 'block';
-      unlockStep(4);
-      setStep(3, 'done');
-      setStep(4, 'active');
-      showStatus('✓ Demo Mode: Ο κλώνος είναι έτοιμος. (Με πραγματικό API key θα ακούγεται η φωνή σου να λέει: "' + text.substring(0, 40) + '...")', 'success');
-      document.getElementById('cloneBtn').disabled = false;
-    }
-
-    function delay(ms) {
-      return new Promise(resolve => setTimeout(resolve, ms));
+    function blobToBase64(blob) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onloadend = () => resolve(reader.result.split(',')[1]);
+        reader.onerror = reject;
+        reader.readAsDataURL(blob);
+      });
     }
 
     function showStatus(msg, type) {
