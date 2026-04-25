@@ -398,6 +398,102 @@
     .qs-btn.active { background: var(--red); color: #fff; }
     .qs-btn:disabled { opacity: 0.35; cursor: not-allowed; }
     .qs-btn.active:disabled { opacity: 0.65; }
+
+    /* ── SCOREBOARD ── */
+    .scoreboard {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      padding: 28px;
+      max-width: 500px;
+      margin: 40px auto 0;
+      text-align: left;
+    }
+
+    .scoreboard h3 {
+      font-size: 0.7rem;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--red);
+      margin-bottom: 16px;
+    }
+
+    .sb-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.85rem;
+    }
+
+    .sb-row:last-child { border-bottom: none; }
+
+    .sb-rank        { width: 22px; text-align: center; color: var(--muted); font-size: 0.75rem; flex-shrink: 0; }
+    .sb-rank.gold   { color: #f5c518; font-size: 1rem; }
+    .sb-rank.silver { color: #aaa;    font-size: 1rem; }
+    .sb-rank.bronze { color: #cd7f32; font-size: 1rem; }
+
+    .sb-name  { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .sb-date  { color: var(--muted); font-size: 0.72rem; flex-shrink: 0; }
+    .sb-score { font-weight: 900; color: var(--red); flex-shrink: 0; min-width: 50px; text-align: right; }
+
+    .sb-empty   { color: var(--muted); font-size: 0.85rem; text-align: center; padding: 20px 0; }
+    .sb-loading { color: var(--muted); font-size: 0.82rem; text-align: center; padding: 16px 0; }
+
+    /* ── NAME INPUT (αποτελέσματα) ── */
+    .name-save-wrap {
+      max-width: 500px;
+      margin: 0 auto 12px;
+      text-align: left;
+    }
+
+    .name-save-wrap label {
+      display: block;
+      font-size: 0.72rem;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 10px;
+    }
+
+    .name-save-row { display: flex; gap: 10px; }
+
+    .name-input {
+      flex: 1;
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 13px 16px;
+      font-size: 0.9rem;
+      font-family: inherit;
+      outline: none;
+      transition: border-color 0.15s;
+    }
+
+    .name-input:focus { border-color: var(--red); }
+    .name-input::placeholder { color: var(--muted); }
+    .name-input:disabled { opacity: 0.5; }
+
+    .save-score-btn {
+      padding: 13px 22px;
+      background: var(--red);
+      color: #fff;
+      border: none;
+      cursor: pointer;
+      font-size: 0.85rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      transition: opacity 0.2s;
+      white-space: nowrap;
+    }
+
+    .save-score-btn:hover:not(:disabled) { opacity: 0.85; }
+    .save-score-btn:disabled { opacity: 0.45; cursor: default; }
+
+    .save-status { font-size: 0.8rem; margin-top: 8px; min-height: 18px; color: var(--muted); }
+    .save-status.ok  { color: var(--green); }
+    .save-status.err { color: var(--red); }
   </style>
 </head>
 <body>
@@ -415,6 +511,11 @@
     <p>Απάντησε αν πιστεύεις ότι είναι <strong>αληθινά</strong> ή δημιουργήθηκαν από <strong>AI</strong>.</p>
     <p style="color: var(--red); font-size: 0.85rem;">Η μέση ανθρώπινη επιτυχία: <strong>24,5%</strong> σωστά. Μπορείς να τα πας καλύτερα;</p>
     <button class="start-btn" onclick="startQuiz()">ΞΕΚΙΝΑ ΤΟ QUIZ</button>
+
+    <div class="scoreboard">
+      <h3>Leaderboard</h3>
+      <div id="introScoreboardList"><div class="sb-loading">Φόρτωση...</div></div>
+    </div>
   </div>
 
   <!-- QUIZ -->
@@ -462,6 +563,24 @@
         <span>Απώλειες από AI fraud 2024 (FBI IC3)</span>
         <span class="val">$16,6B</span>
       </div>
+    </div>
+
+    <!-- Αποθήκευση σκορ -->
+    <div class="name-save-wrap" id="nameSaveWrap">
+      <label>Αποθήκευσε το σκορ σου στο leaderboard</label>
+      <div class="name-save-row">
+        <input type="text" class="name-input" id="playerName"
+               placeholder="Το όνομά σου..." maxlength="30"
+               onkeydown="if(event.key==='Enter') saveScore()">
+        <button class="save-score-btn" id="saveBtn" onclick="saveScore()">Αποθήκευση</button>
+      </div>
+      <div class="save-status" id="saveStatus"></div>
+    </div>
+
+    <!-- Scoreboard αποτελεσμάτων -->
+    <div class="scoreboard" style="margin-bottom: 32px;">
+      <h3>Leaderboard</h3>
+      <div id="resultsScoreboardList"><div class="sb-loading">Φόρτωση...</div></div>
     </div>
 
     <button class="restart-btn" onclick="restartQuiz()">ΠΑΙΞΕ ΞΑΝΑ</button>
@@ -925,13 +1044,115 @@
 
       document.getElementById('resultTitle').textContent = title;
       document.getElementById('resultMsg').textContent = msg;
+      resetNameInput();
     }
 
     /* ── ΕΠΑΝΕΚΚΙΝΗΣΗ ── */
     function restartQuiz() {
       document.getElementById('resultsScreen').classList.remove('show');
+      resetNameInput();
       startQuiz();
     }
+
+    /* ── SCOREBOARD: φόρτωση και εμφάνιση ── */
+    async function fetchScores() {
+      try {
+        const res = await fetch('/.netlify/functions/scores');
+        if (!res.ok) throw new Error();
+        const scores = await res.json();
+        renderScoreboard(scores, 'introScoreboardList');
+        renderScoreboard(scores, 'resultsScoreboardList');
+      } catch {
+        const msg = '<div class="sb-empty">Δεν ήταν δυνατή η φόρτωση.</div>';
+        document.getElementById('introScoreboardList').innerHTML = msg;
+        document.getElementById('resultsScoreboardList').innerHTML = msg;
+      }
+    }
+
+    function renderScoreboard(scores, elementId) {
+      const el = document.getElementById(elementId);
+      if (!el) return;
+      const medals = ['🥇', '🥈', '🥉'];
+
+      if (!scores || scores.length === 0) {
+        el.innerHTML = '<div class="sb-empty">Κανένα σκορ ακόμα — γίνε ο πρώτος!</div>';
+        return;
+      }
+
+      el.innerHTML = scores.map((s, i) => {
+        const rankHtml = i < 3
+          ? `<span class="sb-rank ${['gold','silver','bronze'][i]}">${medals[i]}</span>`
+          : `<span class="sb-rank">${i + 1}</span>`;
+        const date = new Date(s.created_at).toLocaleDateString('el-GR', { day: '2-digit', month: '2-digit' });
+        return `
+          <div class="sb-row">
+            ${rankHtml}
+            <span class="sb-name">${escHtml(s.name)}</span>
+            <span class="sb-date">${date}</span>
+            <span class="sb-score">${s.score}/${s.total} (${s.percentage}%)</span>
+          </div>`;
+      }).join('');
+    }
+
+    /* ── SCOREBOARD: αποθήκευση ── */
+    async function saveScore() {
+      const nameEl   = document.getElementById('playerName');
+      const saveBtn  = document.getElementById('saveBtn');
+      const statusEl = document.getElementById('saveStatus');
+      const name = nameEl.value.trim();
+
+      if (!name) {
+        statusEl.textContent = 'Γράψε πρώτα ένα όνομα.';
+        statusEl.className = 'save-status err';
+        nameEl.focus();
+        return;
+      }
+
+      saveBtn.disabled = true;
+      saveBtn.textContent = '...';
+      statusEl.textContent = '';
+      statusEl.className = 'save-status';
+
+      try {
+        const res = await fetch('/.netlify/functions/scores', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, score, total: activeQuestions.length })
+        });
+        if (!res.ok) throw new Error();
+
+        nameEl.disabled = true;
+        saveBtn.textContent = '✓ Αποθηκεύτηκε';
+        statusEl.textContent = 'Το σκορ σου προστέθηκε!';
+        statusEl.className = 'save-status ok';
+        document.getElementById('nameSaveWrap').style.display = 'none';
+        fetchScores();
+      } catch {
+        saveBtn.disabled = false;
+        saveBtn.textContent = 'Αποθήκευση';
+        statusEl.textContent = 'Σφάλμα. Δοκίμασε ξανά.';
+        statusEl.className = 'save-status err';
+      }
+    }
+
+    function resetNameInput() {
+      document.getElementById('playerName').value = '';
+      document.getElementById('playerName').disabled = false;
+      document.getElementById('saveBtn').disabled = false;
+      document.getElementById('saveBtn').textContent = 'Αποθήκευση';
+      document.getElementById('saveStatus').textContent = '';
+      document.getElementById('saveStatus').className = 'save-status';
+      document.getElementById('nameSaveWrap').style.display = 'block';
+    }
+
+    function escHtml(str) {
+      return String(str)
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    /* φόρτωση scoreboard μόλις ανοίξει η σελίδα */
+    window.addEventListener('load', fetchScores);
   </script>
 
 </body>
