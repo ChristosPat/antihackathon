@@ -561,7 +561,7 @@
 
         mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
         mediaRecorder.onstop = () => {
-          recordedBlob = new Blob(audioChunks, { type: 'audio/webm' });
+          recordedBlob = new Blob(audioChunks, { type: mimeType });
           const url = URL.createObjectURL(recordedBlob);
           document.getElementById('originalAudio').src = url;
           stream.getTracks().forEach(t => t.stop());
