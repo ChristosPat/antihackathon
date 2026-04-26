@@ -50,14 +50,15 @@ exports.handler = async (event) => {
     }
 
     if (action === 'tts') {
-      const { voiceId, text } = body;
+      const { voiceId, text, speed } = body;
       const res = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`, {
         method: 'POST',
         headers: { 'xi-api-key': apiKey, 'Content-Type': 'application/json' },
         body: JSON.stringify({
           text,
           model_id: 'eleven_multilingual_v2',
-          voice_settings: { stability: 0.5, similarity_boost: 0.85 }
+          voice_settings: { stability: 0.5, similarity_boost: 0.85 },
+          speed: (typeof speed === 'number' && speed >= 0.7 && speed <= 1.2) ? speed : 0.9
         })
       });
       if (!res.ok) {
