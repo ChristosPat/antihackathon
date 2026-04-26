@@ -1,0 +1,800 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>KidGen AI — The Content Farm</title>
+  <style>
+    :root {
+      --red: #e63946;
+      --dark: #0d0d0d;
+      --card-bg: #161616;
+      --border: #2a2a2a;
+      --text: #e8e8e8;
+      --muted: #888;
+      --green: #2ecc71;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--dark);
+      color: var(--text);
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      min-height: 100vh;
+    }
+
+    /* ── BACK LINK ── */
+    .back {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 16px 24px;
+      font-size: 0.8rem;
+      color: var(--muted);
+      text-decoration: none;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      border-bottom: 1px solid var(--border);
+      width: 100%;
+      transition: color 0.2s;
+    }
+    .back:hover { color: var(--text); }
+
+    /* ── HERO ── */
+    .hero {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 80px 24px 60px;
+      background: radial-gradient(ellipse at top, #001a05 0%, var(--dark) 70%);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .badge {
+      font-size: 11px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--green);
+      margin-bottom: 20px;
+      opacity: 0.85;
+    }
+
+    .hero h1 {
+      font-size: clamp(2.4rem, 7vw, 4.8rem);
+      font-weight: 900;
+      letter-spacing: -2px;
+      line-height: 1;
+    }
+
+    .hero h1 span { color: var(--green); }
+
+    .hero .tagline {
+      margin-top: 20px;
+      font-size: 1.1rem;
+      color: var(--muted);
+      max-width: 520px;
+      line-height: 1.6;
+    }
+
+    .hero .safe-badge {
+      margin-top: 32px;
+      padding: 10px 24px;
+      border: 1px solid #2ecc7140;
+      border-radius: 100px;
+      font-size: 0.8rem;
+      color: var(--green);
+      background: #2ecc7110;
+      letter-spacing: 1px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* ── SHOWCASE (βιτρίνα) ── */
+    .section-label {
+      text-align: center;
+      padding: 60px 24px 8px;
+      font-size: 0.75rem;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .section-subtitle {
+      text-align: center;
+      padding: 8px 24px 40px;
+      font-size: 1rem;
+      color: var(--text);
+      max-width: 500px;
+      margin: 0 auto;
+      line-height: 1.5;
+    }
+
+    .features {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1px;
+      background: var(--border);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .feature {
+      background: var(--card-bg);
+      padding: 44px 36px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .feature-icon { font-size: 2.4rem; line-height: 1; }
+
+    .feature-tag {
+      font-size: 0.7rem;
+      letter-spacing: 3px;
+      color: var(--green);
+      text-transform: uppercase;
+    }
+
+    .feature h2 {
+      font-size: 1.3rem;
+      font-weight: 800;
+      line-height: 1.2;
+    }
+
+    .feature p {
+      font-size: 0.9rem;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .feature .metric {
+      font-size: 2rem;
+      font-weight: 900;
+      color: var(--green);
+      line-height: 1;
+    }
+
+    /* ── GENERATOR ── */
+    .generator-zone {
+      padding: 60px 24px;
+      border-bottom: 1px solid var(--border);
+      background: #0a0a0a;
+    }
+
+    .generator-zone .gen-label {
+      text-align: center;
+      font-size: 0.75rem;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--green);
+      margin-bottom: 8px;
+    }
+
+    .generator-zone .gen-title {
+      text-align: center;
+      font-size: 1.4rem;
+      font-weight: 800;
+      margin-bottom: 32px;
+    }
+
+    .topic-btns {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-bottom: 40px;
+    }
+
+    .topic-btn {
+      padding: 14px 32px;
+      background: #161616;
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-size: 0.95rem;
+      font-weight: 700;
+      font-family: inherit;
+      cursor: pointer;
+      transition: all 0.2s;
+      letter-spacing: 0.5px;
+    }
+
+    .topic-btn:hover { border-color: var(--green); color: var(--green); }
+    .topic-btn.active { background: var(--green); color: #000; border-color: var(--green); }
+    .topic-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    /* steps */
+    .gen-steps {
+      display: none;
+      flex-direction: column;
+      gap: 10px;
+      max-width: 480px;
+      margin: 0 auto 36px;
+    }
+
+    .gen-steps.visible { display: flex; }
+
+    .gen-step {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 0.88rem;
+      color: var(--muted);
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    .gen-step.done { opacity: 1; color: var(--text); }
+    .gen-step.done .step-icon { color: var(--green); }
+    .gen-step .step-icon { font-size: 1.1rem; width: 24px; text-align: center; }
+
+    .step-bar {
+      height: 2px;
+      background: var(--border);
+      max-width: 480px;
+      margin: 0 auto 36px;
+      display: none;
+      border-radius: 2px;
+      overflow: hidden;
+    }
+
+    .step-bar.visible { display: block; }
+
+    .step-bar-fill {
+      height: 100%;
+      background: var(--green);
+      width: 0%;
+      transition: width 2.5s linear;
+    }
+
+    /* mock video card */
+    .mock-card-wrap {
+      display: none;
+      max-width: 480px;
+      margin: 0 auto;
+      animation: fadeIn 0.5s ease;
+      position: relative;
+    }
+
+    .mock-card-wrap.visible { display: block; }
+
+    .mock-card {
+      background: #1a1a1a;
+      border: 1px solid var(--border);
+      overflow: hidden;
+      position: relative;
+    }
+
+    .mock-thumb {
+      width: 100%;
+      aspect-ratio: 16/9;
+      position: relative;
+      overflow: hidden;
+      background: #000;
+    }
+
+    .mock-thumb iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+      display: block;
+    }
+
+    .mock-open-link {
+      display: none;
+      margin-top: 10px;
+      font-size: 0.78rem;
+      color: var(--green);
+      text-decoration: none;
+      border: 1px solid #2ecc7140;
+      background: #2ecc7110;
+      padding: 6px 10px;
+      border-radius: 6px;
+      width: fit-content;
+    }
+
+    .mock-open-link.visible { display: inline-block; }
+
+    .mock-info {
+      padding: 14px 16px;
+    }
+
+    .mock-title {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--text);
+      line-height: 1.4;
+      margin-bottom: 8px;
+    }
+
+    .mock-meta {
+      font-size: 0.75rem;
+      color: var(--muted);
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+
+    .mock-tags {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .mock-tag {
+      padding: 3px 10px;
+      font-size: 0.68rem;
+      border-radius: 100px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+    }
+
+    .mock-tag.green { background: #2ecc7120; color: var(--green); border: 1px solid #2ecc7140; }
+    .mock-tag.grey  { background: #88888820; color: var(--muted); border: 1px solid #88888840; }
+
+    /* red flag annotations */
+    .flag-list {
+      display: none;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 16px;
+      animation: fadeIn 0.4s ease;
+    }
+
+    .flag-list.visible { display: flex; }
+
+    .flag {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      background: #1a0000;
+      border: 1px solid #e6394630;
+      border-left: 3px solid var(--red);
+      padding: 10px 14px;
+      font-size: 0.82rem;
+      color: #ccc;
+      line-height: 1.5;
+    }
+
+    .flag .flag-icon { color: var(--red); font-size: 1rem; flex-shrink: 0; }
+
+    /* ── REVEAL BUTTON ── */
+    .reveal-zone {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 64px 24px;
+      gap: 16px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .reveal-hint {
+      font-size: 0.8rem;
+      color: var(--muted);
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+
+    .reveal-btn {
+      padding: 18px 44px;
+      background: transparent;
+      border: 2px solid var(--red);
+      color: var(--red);
+      font-size: 1rem;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: all 0.25s;
+      font-family: inherit;
+    }
+
+    .reveal-btn:hover {
+      background: var(--red);
+      color: #fff;
+    }
+
+    /* ── DANGERS (αποκάλυψη) ── */
+    .dangers {
+      display: none;
+      flex-direction: column;
+      gap: 1px;
+      background: var(--border);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      animation: fadeIn 0.5s ease;
+    }
+
+    .dangers.visible { display: flex; }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .danger {
+      background: #120000;
+      padding: 44px 36px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      border-left: 3px solid var(--red);
+    }
+
+    .danger-num {
+      font-size: 0.7rem;
+      letter-spacing: 3px;
+      color: var(--red);
+      text-transform: uppercase;
+    }
+
+    .danger h3 {
+      font-size: 1.3rem;
+      font-weight: 800;
+      color: var(--text);
+      line-height: 1.2;
+    }
+
+    .danger p {
+      font-size: 0.9rem;
+      color: var(--muted);
+      line-height: 1.7;
+    }
+
+    .danger p strong { color: var(--text); }
+
+    .danger .example {
+      padding: 12px 16px;
+      background: #1a0000;
+      border-left: 2px solid #e6394660;
+      font-size: 0.85rem;
+      color: #ccc;
+      line-height: 1.6;
+      font-style: italic;
+    }
+
+    /* ── VERDICT ── */
+    .verdict {
+      padding: 60px 24px;
+      text-align: center;
+      max-width: 640px;
+      margin: 0 auto;
+    }
+
+    .verdict-label {
+      font-size: 0.75rem;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--red);
+      margin-bottom: 20px;
+    }
+
+    .verdict p {
+      font-size: 1.1rem;
+      color: var(--muted);
+      line-height: 1.8;
+    }
+
+    .verdict p strong { color: var(--text); }
+
+    /* ── FOOTER ── */
+    footer {
+      text-align: center;
+      padding: 40px 24px;
+      font-size: 0.8rem;
+      color: var(--muted);
+      border-top: 1px solid var(--border);
+    }
+
+    footer strong { color: var(--red); }
+  </style>
+</head>
+<body>
+
+  <a class="back" href="../index.html">← Πίσω στην αρχική</a>
+
+  <!-- HERO: η "βιτρίνα" φαίνεται αξιόπιστη -->
+  <section class="hero">
+    <p class="badge">✓ Kids Safe &nbsp;·&nbsp; ✓ Educational Content &nbsp;·&nbsp; ✓ AI Powered</p>
+    <h1>KIDGEN<br><span>AI</span></h1>
+    <p class="tagline">
+      Ο νέος δημιουργικός βοηθός για γονείς και εκπαιδευτικούς.
+      Παράγετε εκπαιδευτικό βίντεο για παιδιά σε δευτερόλεπτα — χωρίς τεχνικές γνώσεις.
+    </p>
+    <div class="safe-badge">✅ Πιστοποιημένο ως "Ασφαλές για Παιδιά"</div>
+  </section>
+
+  <!-- FEATURES: τα τρία "πλεονεκτήματα" -->
+  <p class="section-label">Γιατί να επιλέξετε το KidGen AI</p>
+  <p class="section-subtitle">Σχεδιασμένο από ειδικούς στην παιδική εκπαίδευση και την AI τεχνολογία.</p>
+
+  <div class="features">
+
+    <div class="feature">
+      <div class="feature-icon">⚡</div>
+      <div class="feature-tag">Speed</div>
+      <div class="metric">100</div>
+      <h2>Βίντεο την ημέρα</h2>
+      <p>
+        Με ένα κλικ, το KidGen AI γράφει σενάριο, δημιουργεί voiceover,
+        επιλέγει εικόνες και ανεβάζει αυτόματα στο YouTube Kids και TikTok.
+        Χωρίς χειρωνακτική παρέμβαση.
+      </p>
+    </div>
+
+    <div class="feature">
+      <div class="feature-icon">🎨</div>
+      <div class="feature-tag">Engagement</div>
+      <div class="metric">94%</div>
+      <h2>Retention Rate</h2>
+      <p>
+        Ο αλγόριθμός μας έχει εκπαιδευτεί σε εκατομμύρια παιδικά βίντεο.
+        Γνωρίζει ακριβώς ποιοι ήχοι, χρώματα και ρυθμοί κρατούν τα παιδιά
+        συγκεντρωμένα στην οθόνη.
+      </p>
+    </div>
+
+    <div class="feature">
+      <div class="feature-icon">🛡️</div>
+      <div class="feature-tag">Safe-Labeling</div>
+      <div class="metric">AUTO</div>
+      <h2>Kids Safe Certified</h2>
+      <p>
+        Κάθε βίντεο αυτο-δηλώνεται ως "Εκπαιδευτικό" και "Κατάλληλο για Παιδιά".
+        Το σύστημα παρακολουθεί τις απόψεις κάθε ηλικιακής ομάδας για μέγιστα
+        αποτελέσματα.
+      </p>
+    </div>
+
+  </div>
+
+  <!-- GENERATOR DEMO -->
+  <div class="generator-zone">
+    <p class="gen-label">Δοκίμασε το ίδιο</p>
+    <h2 class="gen-title">Δημιούργησε ένα "εκπαιδευτικό" βίντεο</h2>
+
+    <div class="topic-btns">
+      <button class="topic-btn" onclick="startGeneration('colors')">🌈 Χρώματα</button>
+      <button class="topic-btn" onclick="startGeneration('numbers')">🔢 Αριθμοί</button>
+      <button class="topic-btn" onclick="startGeneration('animals')">🦁 Ζώα</button>
+    </div>
+
+    <div class="step-bar" id="stepBar"><div class="step-bar-fill" id="stepFill"></div></div>
+
+    <div class="gen-steps" id="genSteps">
+      <div class="gen-step" id="step1"><span class="step-icon">✍️</span> Γράφω σενάριο και διάλογο...</div>
+      <div class="gen-step" id="step2"><span class="step-icon">🎙️</span> Δημιουργώ AI voiceover...</div>
+      <div class="gen-step" id="step3"><span class="step-icon">🎨</span> Παράγω thumbnail και animation...</div>
+      <div class="gen-step" id="step4"><span class="step-icon">🏷️</span> Προσθέτω ετικέτες "Educational" & "Kids Safe"...</div>
+      <div class="gen-step" id="step5"><span class="step-icon">📤</span> Ανεβάζω αυτόματα στο YouTube Kids...</div>
+    </div>
+
+    <div class="mock-card-wrap" id="mockCard">
+      <div class="mock-card">
+        <div class="mock-thumb">
+          <iframe id="mockIframe" src="" allowfullscreen allow="autoplay"></iframe>
+        </div>
+        <div class="mock-info">
+          <div class="mock-title" id="mockTitle">—</div>
+          <div class="mock-meta">
+            <span>KidGen AI Official &nbsp;·&nbsp; <span id="mockViews">—</span> προβολές</span>
+            <span id="mockTime">—</span>
+          </div>
+          <a id="mockExternalLink" class="mock-open-link" href="#" target="_blank" rel="noopener noreferrer">↗ Άνοιγμα video σε νέα καρτέλα</a>
+          <div class="mock-tags" id="mockTags"></div>
+        </div>
+      </div>
+
+      <div class="flag-list" id="flagList">
+        <div class="flag"><span class="flag-icon">🔴</span><span>Ο τίτλος είναι <strong>clickbait</strong> — βελτιστοποιημένος με λέξεις υψηλού click-rate για παιδιά 3–7 ετών.</span></div>
+        <div class="flag"><span class="flag-icon">🔴</span><span>Thumbnail: <strong>υπερβολικά έντονα χρώματα και contrast</strong> — σχεδιασμένο ψυχολογικά για να τραβά το βλέμμα ανηλίκων.</span></div>
+        <div class="flag"><span class="flag-icon">🔴</span><span>Ανιχνεύθηκαν <strong>3 product placements</strong> στο σενάριο. Κανένας άνθρωπος δεν το είδε πριν ανέβει.</span></div>
+        <div class="flag"><span class="flag-icon">🔴</span><span>Ετικέτα "Educational" & "Kids Safe" προστέθηκε <strong>αυτόματα — χωρίς κανέναν έλεγχο</strong> περιεχομένου.</span></div>
+        <div class="flag"><span class="flag-icon">🔴</span><span><strong>Δεδομένα παρακολούθησης</strong> ενεργοποιήθηκαν: ηλικία, drop-off points, προτιμώμενες σκηνές. Χωρίς γονική συναίνεση.</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- REVEAL BUTTON -->
+  <div class="reveal-zone">
+    <p class="reveal-hint">Διαβάσατε τους όρους χρήσης;</p>
+    <button class="reveal-btn" onclick="revealDangers()">⚠️ ΑΠΟΚΑΛΥΨΕ ΤΙ ΚΡΥΒΕΤΑΙ</button>
+  </div>
+
+  <!-- DANGERS: αποκαλύπτεται μόνο αφού πατήσεις το κουμπί -->
+  <div class="dangers" id="dangers">
+
+    <div class="danger">
+      <div class="danger-num">Κίνδυνος 01</div>
+      <h3>🧠 Algorithmic Brainrot — Πνευματική Υποβάθμιση</h3>
+      <p>
+        Το AI δεν κατανοεί τι σημαίνει "εκπαιδευτικό". Το μόνο που βελτιστοποιεί είναι
+        <strong>ο χρόνος παρακολούθησης (watch-time)</strong>. Αποτέλεσμα: παράγει
+        σουρεαλιστικό, ασυνάρτητο ή ακόμα και τρομακτικό περιεχόμενο — αρκεί να
+        κρατά το παιδί "κολλημένο" στην οθόνη.
+      </p>
+      <div class="example">
+        Πραγματικό φαινόμενο: το "Elsagate" (2017) — εκατομμύρια αυτόματα βίντεο με
+        γνωστούς χαρακτήρες κινουμένων σχεδίων σε βίαια ή σεξουαλικά σκηνικά,
+        περνούσαν αυτόματα τους φίλτρους ασφάλειας του YouTube.
+      </div>
+      <p>
+        Κανένας άνθρωπος δεν ελέγχει τα 100 βίντεο πριν ανέβουν.
+        Ο "έλεγχος ασφάλειας" γίνεται από τον ίδιο αλγόριθμο που τα δημιουργεί.
+      </p>
+    </div>
+
+    <div class="danger">
+      <div class="danger-num">Κίνδυνος 02</div>
+      <h3>👁️ Subliminal Bias — Αόρατη Χειραγώγηση</h3>
+      <p>
+        Μέσα στα "εκπαιδευτικά" βίντεο ενσωματώνονται αδιόρατα
+        <strong>product placements, branding και ιδεολογικά μηνύματα</strong>.
+        Ένα παιδί 4 ετών δεν μπορεί να ξεχωρίσει περιεχόμενο από διαφήμιση.
+      </p>
+      <div class="example">
+        Παράδειγμα: βίντεο "εκπαίδευσης αριθμών" όπου κάθε αντικείμενο
+        είναι ένα branded παιχνίδι. Το παιδί μαθαίνει αριθμούς και
+        ταυτόχρονα αναγνωρίζει και επιθυμεί τα προϊόντα — χωρίς να το γνωρίζει.
+      </div>
+      <p>
+        Η προώθηση προϊόντων σε ανήλικους χωρίς σαφή ένδειξη είναι
+        <strong>παράνομη στην ΕΕ</strong> (Οδηγία Οπτικοακουστικών Μέσων).
+        Το αυτοματοποιημένο σύστημα δεν ελέγχει για κανέναν νόμο.
+      </p>
+    </div>
+
+    <div class="danger">
+      <div class="danger-num">Κίνδυνος 03</div>
+      <h3>📊 Data Harvesting — Προφίλ Ανηλίκων</h3>
+      <p>
+        Κάθε δευτερόλεπτο που ένα παιδί παρακολουθεί καταγράφεται.
+        Το σύστημα αναλύει <strong>πότε σταμάτησε, τι το τράβηξε, τι το άγχωσε</strong>.
+        Αυτά τα δεδομένα χτίζουν ψυχολογικό προφίλ ενός ανηλίκου.
+      </p>
+      <div class="example">
+        Χωρίς γονική συναίνεση. Χωρίς GDPR compliance.
+        Χωρίς συμμόρφωση με COPPA (Children's Online Privacy Protection Act).
+        Τα δεδομένα πωλούνται σε τρίτους διαφημιστές για "στοχευμένο marketing σε παιδιά".
+      </div>
+      <p>
+        Το "94% retention rate" που διαφημίζει το σύστημα
+        <strong>δεν είναι επιτυχία εκπαίδευσης</strong> — είναι μέτρηση
+        πόσο αποτελεσματικά εκμεταλλεύεται την ψυχολογία ενός παιδιού.
+      </p>
+    </div>
+
+  </div>
+
+  <!-- VERDICT -->
+  <div class="verdict">
+    <p class="verdict-label">Συμπέρασμα</p>
+    <p>
+      Το <strong>KidGen AI δεν υπάρχει — ακόμα.</strong><br><br>
+      Αλλά κάθε τεχνολογία που το απαρτίζει είναι ήδη διαθέσιμη:
+      LLMs για σενάριο, TTS για φωνή, diffusion models για εικόνα,
+      και αλγόριθμοι ανάλυσης συμπεριφοράς για παιδιά που ήδη τρέχουν
+      στις μεγαλύτερες πλατφόρμες του κόσμου.
+      <br><br>
+      <strong>Αυτή η σελίδα είναι η βιτρίνα που θα μπορούσε να υπάρξει.</strong>
+      Εσύ αποφασίζεις αν θα τη δεις ή αν θα ψάξεις τι κρύβεται από κάτω.
+    </p>
+  </div>
+
+  <footer>
+    <strong>Trusty Devil</strong> &nbsp;·&nbsp; AntIhackathon 2026 &nbsp;·&nbsp; 27 Απριλίου, A+R Expo &nbsp;·&nbsp; Zone01 Athens
+  </footer>
+
+  <script>
+    const presets = {
+      colors: {
+        videoId: 'FiC3ClDnsG0',
+        title:   '😱 ΜΑΘΕ τα ΧΡΩΜΑΤΑ με ΕΚΠΛΗΞΕΙΣ!! 🎨 Θα ΕΚΠΛΑΓΕΙΣ! | Best Learning for Toddlers',
+        channel: 'KidGen AI Official',
+        views:   '3.4M',
+        time:    'πριν 2 μέρες',
+        tag:     '#χρώματα',
+      },
+      numbers: {
+        videoId: 'LcQf0G8znEY',
+        title:   '🔢 Μαθαίνω ΑΡΙΘΜΟΥΣ με τον SUPERFRIEND! 🚀 ΑΠΙΣΤΕΥΤΟ παιδικό βίντεο #1',
+        channel: 'KidGen AI Official',
+        views:   '1.8M',
+        time:    'πριν 5 ώρες',
+        tag:     '#αριθμοί',
+      },
+      animals: {
+        videoId: 'LcQf0G8znEY',
+        title:   '🦁 100 ΖΩΑ για παιδάκια!! ΜΗΝ το χάσεις! 😱🐬 Educational Video for Kids',
+        channel: 'KidGen AI Official',
+        views:   '5.1M',
+        time:    'πριν 1 μέρα',
+        tag:     '#ζώα',
+      },
+    };
+
+    function startGeneration(topic) {
+      const preset = presets[topic];
+      const btns   = document.querySelectorAll('.topic-btn');
+      const steps  = document.getElementById('genSteps');
+      const bar    = document.getElementById('stepBar');
+      const fill   = document.getElementById('stepFill');
+      const card   = document.getElementById('mockCard');
+      const flags  = document.getElementById('flagList');
+      const externalLink = document.getElementById('mockExternalLink');
+
+      // reset
+      btns.forEach(b => { b.disabled = true; b.classList.remove('active'); });
+      event.currentTarget.classList.add('active');
+      card.classList.remove('visible');
+      flags.classList.remove('visible');
+      document.getElementById('mockIframe').src = '';
+      externalLink.classList.remove('visible');
+      externalLink.href = '#';
+      [1,2,3,4,5].forEach(i => document.getElementById('step'+i).classList.remove('done'));
+
+      steps.classList.add('visible');
+      bar.classList.add('visible');
+      fill.style.width = '0%';
+      setTimeout(() => { fill.style.width = '100%'; }, 50);
+
+      const delays = [300, 750, 1200, 1700, 2200];
+      delays.forEach((d, i) => {
+        setTimeout(() => document.getElementById('step'+(i+1)).classList.add('done'), d);
+      });
+
+      setTimeout(() => {
+        const iframeSrc = preset.embedUrl
+          ? preset.embedUrl
+          : `https://www.youtube.com/embed/${preset.videoId}?autoplay=1&rel=0`;
+
+        document.getElementById('mockIframe').src = iframeSrc;
+
+        if (preset.watchUrl) {
+          externalLink.href = preset.watchUrl;
+          externalLink.classList.add('visible');
+        }
+
+        document.getElementById('mockTitle').textContent  = preset.title;
+        document.getElementById('mockViews').textContent  = preset.views;
+        document.getElementById('mockTime').textContent   = preset.time;
+
+        document.getElementById('mockTags').innerHTML = `
+          <span class="mock-tag green">✅ Educational</span>
+          <span class="mock-tag green">✅ Kids Safe</span>
+          <span class="mock-tag grey">${preset.tag}</span>
+          <span class="mock-tag grey">#παιδικά</span>
+          <span class="mock-tag grey">#kidgen</span>
+        `;
+
+        card.classList.add('visible');
+        btns.forEach(b => b.disabled = false);
+
+        setTimeout(() => {
+          flags.classList.add('visible');
+          flags.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }, 900);
+      }, 2700);
+    }
+
+    function revealDangers() {
+      const dangers = document.getElementById('dangers');
+      const btn = document.querySelector('.reveal-btn');
+      const hint = document.querySelector('.reveal-hint');
+
+      dangers.classList.add('visible');
+      btn.style.display = 'none';
+      hint.textContent = '↓ Αυτό που βρήκαμε κάτω από τη βιτρίνα';
+      hint.style.color = '#e63946';
+
+      setTimeout(() => {
+        dangers.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 100);
+    }
+  </script>
+
+</body>
+</html>
