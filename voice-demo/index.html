@@ -457,6 +457,12 @@
           oninput="document.getElementById('speedVal').textContent = parseFloat(this.value).toFixed(2)">
         <span class="speed-val" id="speedVal">0.90</span>
       </div>
+      <div class="speed-wrap">
+        <span>Ταχύτητα αναπαραγωγής:</span>
+        <input type="range" id="playbackSlider" min="0.5" max="1.0" step="0.05" value="1.0"
+          oninput="document.getElementById('playbackVal').textContent = parseFloat(this.value).toFixed(2); applyPlaybackRate();">
+        <span class="speed-val" id="playbackVal">1.00</span>
+      </div>
 
       <div class="status-msg" id="statusMsg">—</div>
       <button class="clone-btn" id="cloneBtn" onclick="doClone()" disabled>
@@ -695,6 +701,7 @@
         const audioBuffer = await ttsRes.arrayBuffer();
         const url = URL.createObjectURL(new Blob([audioBuffer], { type: 'audio/mpeg' }));
         document.getElementById('clonedAudio').src = url;
+        applyPlaybackRate();
         document.getElementById('playbackArea').style.display = 'block';
         unlockStep(3);
         setStep(2, 'done');
@@ -737,6 +744,7 @@
 
         const url = URL.createObjectURL(new Blob([await ttsRes.arrayBuffer()], { type: 'audio/mpeg' }));
         document.getElementById('clonedAudio').src = url;
+        applyPlaybackRate();
         document.getElementById('playbackArea').style.display = 'block';
         unlockStep(3);
         setStep(2, 'done');
@@ -751,6 +759,7 @@
     function showDemoFallback(text) {
       if (recordedBlob) {
         document.getElementById('clonedAudio').src = URL.createObjectURL(recordedBlob);
+        applyPlaybackRate();
       }
       document.getElementById('playbackArea').style.display = 'block';
       unlockStep(3);
@@ -758,6 +767,11 @@
       setStep(3, 'active');
       showStatus('✓ Demo Mode. Με πλήρες πλάνο ElevenLabs, η AI θα έλεγε «' + text.substring(0, 50) + '...» με τη φωνή σου.', 'success');
       document.getElementById('cloneBtn').disabled = false;
+    }
+
+    function applyPlaybackRate() {
+      const rate = parseFloat(document.getElementById('playbackSlider').value);
+      document.getElementById('clonedAudio').playbackRate = rate;
     }
 
     function blobToBase64(blob) {
