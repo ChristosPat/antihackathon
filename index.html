@@ -120,12 +120,36 @@
 
     .cards {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      grid-template-columns: repeat(3, 1fr);
       gap: 1px;
       background: var(--border);
       margin: 24px 0;
       border-top: 1px solid var(--border);
       border-bottom: 1px solid var(--border);
+    }
+
+    @media (max-width: 768px) {
+      .cards { grid-template-columns: 1fr; }
+    }
+
+    .report-btn {
+      display: block;
+      text-align: center;
+      padding: 20px;
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.82rem;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-bottom: 40px;
+      transition: all 0.2s;
+    }
+
+    .report-btn:hover {
+      color: var(--text);
+      border-color: #555;
     }
 
     .card {
@@ -241,15 +265,15 @@
 
   <div class="cards">
 
-    <a class="card" href="quiz/index.html">
-      <div class="card-icon">🎯</div>
+    <a class="card" href="kidgen/index.html">
+      <div class="card-icon">🧒</div>
       <div class="card-num">Demo 01</div>
-      <h2>Μπορείς να το ξεχωρίσεις;</h2>
+      <h2>KidGen AI — The Content Farm</h2>
       <p>
-        Αληθινό ή AI; Δοκίμασε να αναγνωρίσεις deepfakes σε φωνή, εικόνα και κείμενο.
-        Οι περισσότεροι αποτυγχάνουν — δες γιατί.
+        100 "εκπαιδευτικά" βίντεο για παιδιά την ημέρα, αυτόματα.
+        Τι κρύβεται πίσω από το "Kids Safe" label και ποιος πληρώνει το τίμημα;
       </p>
-      <div class="card-cta">Ξεκίνα το Quiz</div>
+      <div class="card-cta">Δες τη Βιτρίνα</div>
     </a>
 
     <a class="card" href="voice-demo/index.html">
@@ -263,26 +287,26 @@
       <div class="card-cta">Δοκίμασε Live</div>
     </a>
 
+    <a class="card" href="quiz/index.html">
+      <div class="card-icon">🎯</div>
+      <div class="card-num">Demo 03</div>
+      <h2>Μπορείς να το ξεχωρίσεις;</h2>
+      <p>
+        Αληθινό ή AI; Δοκίμασε να αναγνωρίσεις deepfakes σε φωνή, εικόνα και κείμενο.
+        Οι περισσότεροι αποτυγχάνουν — δες γιατί.
+      </p>
+      <div class="card-cta">Ξεκίνα το Quiz</div>
+    </a>
+
     <a class="card" href="manifesto/index.html">
       <div class="card-icon">📜</div>
-      <div class="card-num">Demo 03</div>
+      <div class="card-num">Demo 04</div>
       <h2>The Trustworthy AI Manifesto</h2>
       <p>
         Ένα επίσημο "framework ηθικής AI". Διάβασέ το προσεκτικά.
         Κάθε παράγραφος κρύβει κάτι που δεν θα έπρεπε να υπάρχει.
       </p>
       <div class="card-cta">Διάβασε το Manifesto</div>
-    </a>
-
-    <a class="card" href="kidgen/index.html">
-      <div class="card-icon">🧒</div>
-      <div class="card-num">Demo 04</div>
-      <h2>KidGen AI — The Content Farm</h2>
-      <p>
-        100 "εκπαιδευτικά" βίντεο για παιδιά την ημέρα, αυτόματα.
-        Τι κρύβεται πίσω από το "Kids Safe" label και ποιος πληρώνει το τίμημα;
-      </p>
-      <div class="card-cta">Δες τη Βιτρίνα</div>
     </a>
 
     <a class="card" href="soulmirror/index.html">
@@ -296,18 +320,11 @@
       <div class="card-cta">Δες τη Βιτρίνα</div>
     </a>
 
-    <a class="card" href="report/index.html">
-      <div class="card-icon">📋</div>
-      <div class="card-num">Έκθεση Ασφαλείας</div>
-      <h2>AI Απειλές στη Σημερινή Κοινωνία</h2>
-      <p>
-        Τεκμηριωμένα περιστατικά, στατιστικά και ανάλυση κινδύνων από deepfakes,
-        κλωνοποίηση φωνής και χειραγώγηση μέσω AI.
-      </p>
-      <div class="card-cta">Διάβασε την Έκθεση</div>
-    </a>
-
   </div>
+
+  <a class="report-btn" href="report/index.html">
+    📋 &nbsp; Συμπεράσματα — AI Απειλές στη Σημερινή Κοινωνία
+  </a>
 
   <footer>
     <strong>Trusty Devil</strong> &nbsp;·&nbsp; AntIhackathon 2026 &nbsp;·&nbsp; 27 Απριλίου, A+R Expo &nbsp;·&nbsp; Zone01 Athens
